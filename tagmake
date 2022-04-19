@@ -1,0 +1,5 @@
+#!/usr/bin/env python
+from dbclass import DB, db_fname, read_pipe
+tagname = read_pipe()[0]
+with DB(db_fname) as db:
+    db.make_new_tag(tagname)
