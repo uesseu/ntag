@@ -1,45 +1,23 @@
 #!/usr/bin/env python
-from dbclass import DB, db_fname, read_pipe, get_inode
-from ninpipe import Pipe
+from typing import cast
+from lib.dbclass import DataBase, default_tagdb_fname, get_inode, check_tagdb
+from lib.color import set_color
+from lib.ninpipe import Pipe
 from pathlib import Path
 from os.path import exists
 
+def setup_color(fname: str, color: str) -> str:
+    if color is None:
+        return fname
+    return cast(str, color + fname + set_color('RESET'))
 
-Color = dict(
-    BLACK='\033[30m',
-    RED='\033[31m',
-    GREEN='\033[32m',
-    YELLOW='\033[33m',
-    BLUE='\033[34m',
-    MAGENTA='\033[35m',
-    CYAN='\033[36m',
-    WHITE='\033[37m',
-    COLOR_DEFAULT='\033[39m',
-    BOLD='\033[1m',
-    UNDERLINE='\033[4m',
-    INVISIBLE='\033[08m',
-    REVERCE='\033[07m',
-    BG_BLACK='\033[40m',
-    BG_RED='\033[41m',
-    BG_GREEN='\033[42m',
-    BG_YELLOW='\033[43m',
-    BG_BLUE='\033[44m',
-    BG_MAGENTA='\033[45m',
-    BG_CYAN='\033[46m',
-    BG_WHITE='\033[47m',
-    BG_DEFAULT='\033[49m',
-    RESET='\033[0m',
-)
-
-import time
-ctime = time.time()
-with DB(db_fname) as db:
+with DataBase(check_tagdb(default_tagdb_fname)) as db:
     for data in Pipe().async_iter():
         fname = data.receive()
         if not fname:
             break
         if exists(fname):
             path = Path(fname).absolute()
-            tag = db.inode2tag(get_inode(path))
-            print(fname, tag)
-print(ctime - time.time())
+            tags = db.inode2tag(get_inode(path))
+            ftags = [setup_color(*tag) for tag in tags]
+            print(fname, '[', ' '.join(ftags), ']')

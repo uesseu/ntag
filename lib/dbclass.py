@@ -1,5 +1,5 @@
 import sqlite3
-from typing import List, cast, Any, Optional
+from typing import List, cast, Any, Optional, Union
 from os.path import exists
 from logging import getLogger, INFO, DEBUG
 from pathlib import Path
@@ -8,7 +8,30 @@ from os import stat, environ
 from stat import ST_INO
 logger = getLogger()
 logger.setLevel(INFO)
-db_fname: str = f'{environ["HOME"]}/.config/nintag/nintag.db'
+default_tagdb_fname = '.nintag_db'
+
+def find_tagdb_inparents(fname: str) -> Optional[Path]:
+    '''Returns file name of database in parent directories.
+    If there is no database file, returns None.'''
+    current_dir_filepath = Path('.') / fname
+    if current_dir_filepath.exists():
+        return current_dir_filepath
+    for path in Path('.').absolute().parents:
+        dbpath = path / fname
+        if dbpath.exists():
+            return dbpath
+    return None
+
+def check_tagdb(fname: str) -> str:
+    db_fname: Union[Path, str, None]
+    if 'NINTAG_DB' in environ:
+        db_fname = environ['NINTAG_DB']
+    else:
+        db_fname = find_tagdb_inparents(fname)
+    if db_fname is None:
+        print('Database is not made yet.')
+        print('Consider >tagdbinit to make it in current directory.')
+    return str(db_fname)
 
 def get_inode(path: Path) -> int:
     return stat(path)[ST_INO]
@@ -24,14 +47,14 @@ def read_pipe() -> List[str]:
         except EOFError:
             return file_list
 
-class DB:
+class DataBase:
     def __init__(self, fname: str):
-        self.fname = fname
+        self.db_fname = fname
         self._to_make_new: bool = False if exists(fname) else True
-        if not Path(db_fname).parent.exists():
+        if not Path(self.db_fname).parent.exists():
             raise FileNotFoundError(f'''
-Cannot make file {db_fname}.
-You may need to make directory named {Path(db_fname).parent}.''')
+Cannot make file {self.db_fname}.
+You may need to make directory named {Path(self.db_fname).parent}.''')
         self.con = sqlite3.connect(fname)
         self.cur = self.con.cursor()
         self._make_new_tables()
@@ -39,16 +62,30 @@ You may need to make directory named {Path(db_fname).parent}.''')
     def _make_new_tables(self) -> None:
         if self._to_make_new:
             self.cur.execute('''CREATE TABLE tags
-                             (id integer, tag text)''')
+                             (id integer, tag text, color text,)''')
             self.cur.execute('''CREATE TABLE inode
-                             (id integer, inode integer, color text)''')
-        self.cur.execute('''INSERT INTO tags VALUES(0, NULL);''')
+                             (id integer, inode integer)''')
+            self.cur.execute('''INSERT INTO tags VALUES(0, NULL, NULL);''')
         self.need_to_make_new = False
         self.con.commit()
 
-    def make_new_tag(self, tag: str) -> None:
-        max_tag = list(self.cur.execute('''SELECT MAX(id) FROM tags;'''))[0][0]
-        self.cur.execute('''INSERT INTO tags VALUES(?,?);''', (max_tag + 1, tag))
+    def make_new_tag(self, tag: str, color: Optional[str]=None) -> None:
+        if len(list(self.cur.execute('''SELECT tag FROM tags WHERE tag==?;''',
+                            (tag,)))):
+            return None
+        max_tag = next(self.cur.execute('''SELECT MAX(id) FROM tags;'''))[0]
+        self.cur.execute('''INSERT INTO tags VALUES(?,?,?);''',
+                         (max_tag + 1, tag, color))
+        self.con.commit()
+
+    def set_color(self, tag: str, color: Optional[str]=None) -> None:
+        self.cur.execute('''UPDATE tags SET color=? WHERE tag=?;''',
+                         (color, tag))
+        self.con.commit()
+
+    def rename_tag(self, tag: str, name: str) -> None:
+        self.cur.execute('''UPDATE tags SET tag=? WHERE tag=?;''',
+                         (name, tag))
         self.con.commit()
 
     def _tag2id(self, tag: str) -> int:
@@ -74,14 +111,14 @@ You may need to make directory named {Path(db_fname).parent}.''')
                                         AND inode=?''', (tag, inode)))
         return True if len(matched) else False
 
-    def add_tag(self, inode: str, tag: str, color: Optional[str]=None) -> None:
+    def add_tag(self, inode: str, tag: str) -> None:
         if self.has_tag(inode, tag):
             return None
-        self.cur.execute('''INSERT INTO inode VALUES(?,?,?);''',
-                         (self._tag2id(tag), inode, color))
+        self.cur.execute('''INSERT INTO inode VALUES(?,?);''',
+                         (self._tag2id(tag), inode))
         self.con.commit()
 
-    def __enter__(self) -> 'DB':
+    def __enter__(self) -> 'DataBase':
         return self
 
     def tag2inode(self, tag: int) -> List[str]:
@@ -98,19 +135,25 @@ You may need to make directory named {Path(db_fname).parent}.''')
         print('tags', list(self.cur.execute('select * from tags')))
         print('inode', list(self.cur.execute('select * from inode')))
 
-    def inode2tag(self, inode: str) -> List[str]:
-        sql_iter = self.cur.execute('''SELECT tag
+    def inode2tag(self, inode: int) -> List[str]:
+        sql_iter = self.cur.execute('''SELECT tag, color
                                FROM tags
                                JOIN inode
                                ON tags.id = inode.id
                                WHERE inode = ?;''', (inode,))
         result = list(sql_iter)
         self.con.commit()
-        return [r[0] for r in result]
+        return [r for r in result]
 
     def __exit__(self, *arg: Any) -> None:
         self.con.close()
 
     def close(self) -> None:
         self.__exit__()
+
+def print_status(db: DataBase) -> None:
+    if 'NINTAG_DB' in environ:
+        print('NINTAG_DB:', environ['NINTAG_DB'], '\n  Environment of NINTAG_DB')
+    print('Current database:', db_fname,
+          '\n  Path of current database')
 
