@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, cast
 
 prefix = '\033['
 suffix = 'm'
@@ -42,8 +42,14 @@ BG_COLOR: Dict[str, str] = dict(
     DEFAULT='49',
 )
 
-def set_color(attribute: str = 'RESET', color: str = 'DEFAULT',
+def encode_color(attribute: str = 'RESET', color: str = 'DEFAULT',
               bg_color: str = 'DEFAULT') -> str:
     return prefix\
         + ';'.join((ATTRIBUTE[attribute], COLOR[color], BG_COLOR[bg_color]))\
         + suffix
+
+def format_color(fname: str, color: str) -> str:
+    if color is None:
+        return fname
+    return cast(str, color + fname + encode_color('RESET'))
+
