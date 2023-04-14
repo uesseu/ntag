@@ -4,5 +4,5 @@ from ..lib.dbclass import print_status, DataBase\
 
 def main():
     print_status(
-        DataBase(find_tagdb_inparents(check_tagdb(DEFAULT_TAGDB_FNAME)))
+        DataBase(check_tagdb(DEFAULT_TAGDB_FNAME))
     )

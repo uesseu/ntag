@@ -29,16 +29,17 @@ setup(
     ),
     entry_points={
         "console_scripts": [
-            "ntag_color=ntags.commands.color:main",
-            "ntag_delete=ntags.commands.delete:main",
-            "ntag_init=ntags.commands.init:main",
-            "ntag_list=ntags.commands.list:main",
-            "ntag_make=ntags.commands.make:main",
-            "ntag_show=ntags.commands.show:main",
-            "ntag_add=ntags.commands.add:main",
-            "ntag_remove=ntags.commands.remove:main",
-            "ntag_rename=ntags.commands.rename:main",
-            "ntag_status=ntags.commands.status:main"
+            "ntag-color=ntags.commands.color:main",
+            "ntag-delete=ntags.commands.delete:main",
+            "ntag-init=ntags.commands.init:main",
+            "ntag-list=ntags.commands.list:main",
+            "ntag-make=ntags.commands.make:main",
+            "ntag-show=ntags.commands.show:main",
+            "ntag-add=ntags.commands.add:main",
+            "ntag-remove=ntags.commands.remove:main",
+            "ntag-rename=ntags.commands.rename:main",
+            "ntag-filter=ntags.commands.filter:main",
+            "ntag-status=ntags.commands.status:main"
         ]
     },
     python_requires='>=3.7'

@@ -1,9 +1,15 @@
 #!/usr/bin/env python
 from ..lib.dbclass import DataBase, get_inode, check_tagdb, DEFAULT_TAGDB_FNAME
 from ..lib.ninpipe import Pipe
-from ..lib.misc import get_tag_from_arg
+from argparse import ArgumentParser
 def main():
-    tag = get_tag_from_arg('> ntag-add [tag]')
+    parser = ArgumentParser(description='''Add a tag to file.
+It reads fname from stdin.
+
+Example.
+ls ./*_good.csv | ntag-add good''')
+    parser.add_argument('tag', help='Tag name to delete.')
+    args = parser.parse_args()
     with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
         for fname in Pipe():
-            db.add_tag(get_inode(fname), tag)
+            db.add_tag(get_inode(fname), args.tag)

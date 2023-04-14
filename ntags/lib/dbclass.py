@@ -23,6 +23,10 @@ def find_tagdb_inparents(fname: str) -> Optional[Path]:
     return None
 
 def check_tagdb(fname: str) -> str:
+    '''
+    Find tag file and returns the name.
+    It kills this program itself if there is no tag file.
+    '''
     db_fname: Union[Path, str, None] = None
     if 'NINTAG_DB' in environ:
         db_fname = environ['NINTAG_DB']
@@ -31,6 +35,7 @@ def check_tagdb(fname: str) -> str:
     if db_fname is None:
         print('Database is not made yet.')
         print('Consider >tagdbinit to make it in current directory.')
+        exit()
     return str(db_fname)
 
 def get_inode(fname: str) -> int:
@@ -124,6 +129,9 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
                                       WHERE tag=?
                                         AND inode=?''', (tag, inode)))
         return True if len(matched) else False
+
+    def has_tags(self, inode: int, tags: List[str]) -> bool:
+        return any(self.has_tag(inode, tag) for tag in tags)
 
     def add_tag(self, inode: int, tag: str) -> None:
         if self.has_tag(inode, tag):
