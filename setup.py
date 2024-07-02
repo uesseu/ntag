@@ -18,15 +18,10 @@ setup(
     version=VERSION,
     description='It adds file tags for any unix like systems.',
     long_description=readme,
-    author='ninja',
+    author='Shoichiro Nakanishi',
     author_email='sheepwing@kyudai.jp',
     url='',
     license=license,
-    package_dir={"ntags": "ntags"},
-    packages=find_packages(
-        where="ntags",
-        exclude=('commands')
-    ),
     entry_points={
         "console_scripts": [
             "ntag-color=ntags.commands.color:main",
