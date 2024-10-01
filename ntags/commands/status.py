@@ -1,8 +1,11 @@
 #!/usr/bin/env python
-from ..lib.dbclass import print_status, DataBase\
-    , find_tagdb_inparents, DEFAULT_TAGDB_FNAME, check_tagdb
+from ..lib.dbclass import (
+    print_status, DataBase,
+    DEFAULT_TAGDB_FNAME, check_tagdb
+)
 
-def main():
+
+def status_command(from_root: bool = False):
     print_status(
         DataBase(check_tagdb(DEFAULT_TAGDB_FNAME))
     )

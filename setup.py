@@ -24,17 +24,18 @@ setup(
     license=license,
     entry_points={
         "console_scripts": [
-            "ntag-color=ntags.commands.color:main",
-            "ntag-delete=ntags.commands.delete:main",
-            "ntag-init=ntags.commands.init:main",
-            "ntag-list=ntags.commands.list:main",
-            "ntag-make=ntags.commands.make:main",
-            "ntag-show=ntags.commands.show:main",
-            "ntag-add=ntags.commands.add:main",
-            "ntag-remove=ntags.commands.remove:main",
-            "ntag-rename=ntags.commands.rename:main",
-            "ntag-filter=ntags.commands.filter:main",
-            "ntag-status=ntags.commands.status:main"
+            "ntag-color=ntags.commands.color:color_command",
+            "ntag-delete=ntags.commands.delete:delete_command",
+            "ntag-init=ntags.commands.init:init_command",
+            "ntag-list=ntags.commands.list:list_command",
+            "ntag-make=ntags.commands.make:make_command",
+            "ntag-show=ntags.commands.show:show_command",
+            "ntag-add=ntags.commands.add:add_command",
+            "ntag-remove=ntags.commands.remove:remove_command",
+            "ntag-rename=ntags.commands.rename:rename_command",
+            "ntag-filter=ntags.commands.filter:filter_command",
+            "ntag-status=ntags.commands.status:status_command",
+            "ntag=ntags.commands.command:main"
         ]
     },
     python_requires='>=3.7'

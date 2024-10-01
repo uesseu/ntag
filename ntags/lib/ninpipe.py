@@ -134,13 +134,13 @@ class AsyncPipe:
     def __iter__(self) -> 'AsyncPipe':
         return self
 
+
 def main() -> None:
     for n in Pipe().async_iter():
         if not n.receive():
             break
         print(n.receive(),  'h')
-    
+
 
 if __name__ == '__main__':
     main()
-

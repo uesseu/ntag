@@ -4,11 +4,13 @@ from ..lib.color import format_color
 from ..lib.ninpipe import Pipe
 from ..lib.misc import get_tag_from_arg
 from os.path import exists
-from sys import stdout
+import sys
 from argparse import ArgumentParser
 
-def main() -> None:
-    parser = ArgumentParser(description='''Add a tag to file.
+
+def filter_command(from_root: bool = False) -> None:
+    parser = ArgumentParser(
+        usage='''Add a tag to file.
 It reads fname from stdin.
 
 Example.
@@ -22,12 +24,17 @@ ls ./*_good.csv | ntag-filter good | column''')
             fname = data.receive()
             if not fname:
                 break
-            if exists(fname):
-                inode = get_inode(fname)
-                if db.has_tags(inode, args.tag.split(',')):
-                    if stdout.isatty():
-                        ftags = [format_color(*tag) for tag in
-                                 db.inode2tag(get_inode(fname))]
-                        print(fname, '[', ' '.join(ftags), ']')
-                    else:
-                        print(fname)
+            if not exists(fname):
+                continue
+            inode = get_inode(fname)
+            if not db.has_tags(inode, args.tag.split(',')):
+                continue
+            sys.stdout.write(fname)
+            if sys.stdout.isatty():
+                ftags = [format_color(*tag) for tag in
+                         db.inode2tag(get_inode(fname))]
+                sys.stdout.write('[ ')
+                sys.stdout.write(' '.join(ftags))
+                sys.stdout.write(' ]')
+            sys.stdout.write('\n')
+            sys.stdout.flush()

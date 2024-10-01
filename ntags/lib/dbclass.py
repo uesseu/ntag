@@ -3,7 +3,7 @@ from typing import List, cast, Any, Optional, Union, Tuple, Iterable
 from os.path import exists
 from logging import getLogger, INFO, DEBUG
 from pathlib import Path
-from sys import stderr
+import sys
 from os import stat, environ
 from stat import ST_INO
 logger = getLogger()
@@ -22,6 +22,7 @@ def find_tagdb_inparents(fname: str) -> Optional[Path]:
             return dbpath
     return None
 
+
 def check_tagdb(fname: str) -> str:
     '''
     Find tag file and returns the name.
@@ -35,8 +36,9 @@ def check_tagdb(fname: str) -> str:
     if db_fname is None:
         print('Database is not made yet.')
         print('Consider >tagdbinit to make it in current directory.')
-        exit()
+        sys.exit()
     return str(db_fname)
+
 
 def get_inode(fname: str) -> int:
     return stat(Path(fname).absolute())[ST_INO]
@@ -74,16 +76,16 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
         self.need_to_make_new = False
         self.con.commit()
 
-    def make_new_tag(self, tag: str, color: Optional[str]=None) -> None:
+    def make_new_tag(self, tag: str, color: Optional[str] = None) -> None:
         if len(list(self.cur.execute('''SELECT tag FROM tags WHERE tag==?;''',
-                            (tag,)))):
+                                     (tag,)))):
             return None
         max_tag = next(self.cur.execute('''SELECT MAX(id) FROM tags;'''))[0]
         self.cur.execute('''INSERT INTO tags VALUES(?,?,?);''',
                          (max_tag + 1, tag, color))
         self.con.commit()
 
-    def set_color(self, tag: str, color: Optional[str]=None) -> None:
+    def set_color(self, tag: str, color: Optional[str] = None) -> None:
         self.cur.execute('''UPDATE tags SET color=? WHERE tag=?;''',
                          (color, tag))
         self.con.commit()
@@ -116,18 +118,18 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
             if logger.level == DEBUG:
                 raise BaseException('No such tag.')
             else:
-                stderr.write(f'No such tag: {tag}\n')
+                sys.stderr.write(f'No such tag: {tag}\n')
                 self.__exit__()
                 exit()
         return cast(int, result[0][0])
 
     def has_tag(self, inode: int, tag: str) -> bool:
         matched = list(self.cur.execute('''SELECT inode
-                                      FROM inode
-                                      JOIN tags
-                                      ON inode.id = tags.id
-                                      WHERE tag=?
-                                        AND inode=?''', (tag, inode)))
+FROM inode
+JOIN tags
+ON inode.id = tags.id
+WHERE tag=?
+AND inode=?''', (tag, inode)))
         return True if len(matched) else False
 
     def has_tags(self, inode: int, tags: List[str]) -> bool:
