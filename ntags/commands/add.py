@@ -12,8 +12,7 @@ If there is no tags
 
 Example.
 ls ./*_good.csv | ntag-add good''')
-    if from_root:
-        parser.add_argument('command', help='Sub command of ntag.')
+    parser.add_argument('command', help='Sub command of ntag.')
     parser.add_argument('tag', help='Tag name to delete.')
     args = parser.parse_args()
     with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:

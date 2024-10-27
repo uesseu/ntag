@@ -3,6 +3,15 @@ import sys
 from typing import cast
 
 
+class Command:
+    help = ''
+    def __init__(self):
+        pass
+
+    def run(self):
+        pass
+
+
 def get_tag_from_arg(usage: str, from_root=False) -> str:
     parser = ArgumentParser(usage=usage)
     if from_root:

@@ -1,48 +1,57 @@
 #!/usr/bin/env python
 from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, check_tagdb
 from ..lib.color import COLOR, ATTRIBUTE, BG_COLOR, encode_color, format_color
-import typing
 
-
-def get_param(any_attr: dict) -> typing.Optional[str]:
+def input_int(num_range) -> int:
     while True:
-        attr = input()
-        if attr.strip().upper() in any_attr.keys():
-            return attr.strip().upper()
+        try:
+            result = int(input('> '))
+            if result < num_range:
+                return result
+            else:
+                print(f'Please write number less than {num_range}')
+        except Exception:
+            print('Please write number')
 
 
-def color_command(from_root: bool = False):
-    print('Write tag name in this list')
+def color_command(from_root: bool = False) -> None:
+    print('Write tag number in this list')
     with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
-        for tagname, color in db.get_taglist():
+        taglist = list(db.get_taglist())
+        for num, (tagname, color) in enumerate(taglist):
             if tagname is not None:
-                print(format_color(tagname, color))
-    tag = input()
+                print(num, format_color(tagname, color))
+    tag_number = input_int(len(taglist))
+    print('Write one of the new attribute number in this list.')
+    attr_keys = list(ATTRIBUTE.keys())
+    print(
+        ' '.join(
+            f"{num}: {encode_color(attribute=key)}{key}{encode_color('RESET')}"
+            for num, key in enumerate(attr_keys)
+        )
+    )
+    attr_num = input_int(len(attr_keys))
+    color_list = list(COLOR.keys())
+    print('Write one of the new color number in this list.')
+    print(
+        ' '.join(
+            f"{num}: {encode_color(color=key)}{key}{encode_color('RESET')}"
+            for num, key in enumerate(color_list))
+    )
+    color_num = input_int(len(color_list))
+    bgcolor_list = list(BG_COLOR.keys())
+    print('Write one of the new background color number in this list.')
+    print(' '.join(
+        f"{num}: {encode_color(bg_color=key)}{key}{encode_color('RESET')}"
+        for num, key in enumerate(bgcolor_list))
+          )
+    bgcolor_num = input_int(len(bgcolor_list))
     with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
-        is_tagname = False
-        for tag, color in db.get_taglist():
-            if tag == tagname:
-                is_tagname = True
-                break
-        if not is_tagname:
-            raise Exception('No such tag name.')
-
-    print('Write one of the new attribute in this list.')
-    print(' '.join(encode_color(attribute=key) + key + encode_color('RESET')
-                   for key in ATTRIBUTE.keys()))
-    attr = get_param(ATTRIBUTE)
-    if not attr:
-        raise Exception('No such tag name.')
-
-    print('Write one of the new color in this list.')
-    print(' '.join(encode_color(color=key) + key + encode_color('RESET')
-          for key in COLOR.keys()))
-    color = get_param(COLOR)
-
-    print('Write one of the new background color in this list.')
-    print(' '.join(encode_color(bg_color=key) + key + encode_color('RESET')
-                   for key in BG_COLOR.keys()))
-    bgcolor = get_param(COLOR)
-
-    with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
-        db.set_color(tag, encode_color(attr, color, bgcolor))
+        db.set_color(
+            taglist[tag_number][0],
+            encode_color(
+                attr_keys[attr_num],
+                color_list[color_num],
+                bgcolor_list[bgcolor_num]
+            )
+        )

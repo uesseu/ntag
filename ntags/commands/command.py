@@ -27,9 +27,23 @@ commands['status'] = status_command
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] in commands.keys():
-        commands[sys.argv[1]](from_root=True)
+        commands[sys.argv[1]]()
     else:
-        print(f'''Tag maker for unix like system.
+        print('''Tag maker for unix like system.
 Please look subcommands for details.
 This is list of subcommands.
-{'\n'.join(commands.keys())}''')
+
+# Manage tags
+init   : Initialize tag database
+make   : Make a tag
+color  : Set color of tag
+delete : Delete tag
+status : Show current status
+
+# Use tags
+add    : Add tag
+filter : Filter by tag
+list   : Show list of all the tag
+remove : Remove tag from file
+show   : Show files with tag
+''')

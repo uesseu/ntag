@@ -42,14 +42,14 @@ BG_COLOR: Dict[str, str] = dict(
     DEFAULT='49',
 )
 
+
 def encode_color(attribute: str = 'RESET', color: str = 'DEFAULT',
-              bg_color: str = 'DEFAULT') -> str:
-    return prefix\
-        + ';'.join((ATTRIBUTE[attribute], COLOR[color], BG_COLOR[bg_color]))\
-        + suffix
+                 bg_color: str = 'DEFAULT') -> str:
+    body = ";".join((ATTRIBUTE[attribute], COLOR[color], BG_COLOR[bg_color]))
+    return f'{prefix}{body}{suffix}'
+
 
 def format_color(fname: str, color: str) -> str:
     if color is None:
         return fname
     return cast(str, color + fname + encode_color('RESET'))
-
