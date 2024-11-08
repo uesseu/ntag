@@ -11,8 +11,11 @@ from .make import make_command
 from .remove import remove_command
 from .show import show_command
 from .status import status_command
+from .io import export_command, import_command
 
 commands = {}
+commands['export'] = export_command
+commands['import'] = import_command
 commands['add'] = add_command
 commands['color'] = color_command
 commands['delete'] = delete_command

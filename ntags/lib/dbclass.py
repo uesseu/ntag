@@ -4,8 +4,9 @@ from os.path import exists
 from logging import getLogger, INFO, DEBUG
 from pathlib import Path
 import sys
-from os import stat, environ
+from os import stat, environ, DirEntry
 from stat import ST_INO
+from glob import glob
 logger = getLogger()
 logger.setLevel(INFO)
 DEFAULT_TAGDB_FNAME = '.nintag_db'
@@ -77,7 +78,6 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
             self.cur.execute(
                 '''CREATE TABLE inode (id integer, inode integer)'''
             )
-            self.cur.execute('''INSERT INTO tags VALUES(0, NULL, NULL);''')
         self.need_to_make_new = False
         self.con.commit()
 
@@ -89,6 +89,8 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
         max_tag = next(
             self.cur.execute('''SELECT MAX(id) FROM tags;''')
         )[0]
+        if not max_tag:
+            max_tag = 0
         self.cur.execute(
             '''INSERT INTO tags VALUES(?,?,?);''',
             (max_tag + 1, tag, color)

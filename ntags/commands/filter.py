@@ -27,7 +27,7 @@ ls ./*_good.csv | ntag-filter good | column''')
             if not exists(fname):
                 continue
             inode = get_inode(fname)
-            if not(args.v ^ db.has_tags(inode, args.tag)):
+            if not args.v ^ db.has_tags(inode, args.tag):
                 continue
             sys.stdout.write(fname)
             if sys.stdout.isatty():

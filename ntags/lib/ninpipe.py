@@ -1,23 +1,7 @@
 #!usr/bin/env python3
 from sys import stdin, stdout
-from typing import List, Optional
+from typing import List
 from threading import Thread
-from sys import stdout, stdin
-
-class PipeState:
-    object: Optional['PipeState'] = None
-
-    def __new__(cls) -> 'PipeState':
-        if PipeState.object is None:
-            PipeState.object = object.__new__(cls)
-        return PipeState.object
-
-    def __init__(self) -> None:
-        self.from_pipe = False if stdin.isatty() else True
-        self.to_pipe = False if stdout.isatty() else True
-
-
-pipestate = PipeState()
 
 
 class Pipe:
@@ -27,6 +11,7 @@ class Pipe:
     Further more, it can read lines asynchronously.
     Asynchronous method is async_iter().
     '''
+
     def __init__(self, sep: str = '\n') -> None:
         '''
         sep: str
@@ -44,10 +29,10 @@ class Pipe:
         It is not good for performance.
         '''
         text = []
-        while(True):
+        while (True):
             try:
                 text.append(input())
-            except:
+            except Exception:
                 break
         return text
 
