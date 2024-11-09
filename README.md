@@ -15,3 +15,20 @@ But I could not find such tools. That is all.
 - Only for unix like system.
   + Because it follows inode now.
   + If I or you want windows version, it may be developped.
+
+# Install
+
+```
+pip install git+https://github.com/uesseu/ntag
+```
+
+# Usage
+Please read help text in the command.
+
+```
+ntag -h
+```
+
+```
+ntag add -h
+```
