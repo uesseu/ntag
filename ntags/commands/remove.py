@@ -15,15 +15,20 @@ Example.
 ls | ntag filter tag-name | ntag remove tag-name
 ntag remove tag-name file-name''')
     parser.add_argument('command', help='Sub command.')
-    parser.add_argument('tag', help='Tag name to remove.')
+    parser.add_argument(
+        'tag', nargs='*', action="extend",
+        type=str, help='Tag name to delete.'
+    )
     if stdin.isatty():
         parser.add_argument('fname', help='File name which has tag.')
     args = parser.parse_args()
     if stdin.isatty():
         fname = args.fname
         with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
-            db.remove_tag_from_inode(args.tag, get_inode(fname))
+            for tag in args.tag:
+                db.remove_tag_from_inode(tag, get_inode(fname))
     else:
         with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
             for fname in Pipe():
-                db.remove_tag_from_inode(args.tag, get_inode(fname))
+                for tag in args.tag:
+                    db.remove_tag_from_inode(tag, get_inode(fname))

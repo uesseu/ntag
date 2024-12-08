@@ -16,7 +16,7 @@ Example.
 ls ./*_good.csv | ntag-filter good | column''')
     parser.add_argument('command', help='Sub command.')
     parser.add_argument('-v', default=False, help='Invert flag.')
-    parser.add_argument('tag', nargs='+', help='Tag name to delete.')
+    parser.add_argument('tag', nargs='+', help='Tag name to show.')
     args = parser.parse_args()
 
     with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
