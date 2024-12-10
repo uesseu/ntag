@@ -78,6 +78,9 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
             self.cur.execute(
                 '''CREATE TABLE inode (id integer, inode integer)'''
             )
+            self.cur.execute(
+                '''CREATE TABLE comment (inode integer, comment text)'''
+            )
         self.need_to_make_new = False
         self.con.commit()
 
@@ -92,7 +95,7 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
         if not max_tag:
             max_tag = 0
         self.cur.execute(
-            '''INSERT INTO tags VALUES(?,?,?);''',
+            '''INSERT INTO tags (id, tag, color) VALUES(?,?,?);''',
             (max_tag + 1, tag, color)
         )
         self.con.commit()
@@ -158,11 +161,31 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
     def has_tags(self, inode: int, tags: List[str]) -> bool:
         return any(self.has_tag(inode, tag) for tag in tags)
 
+    def add_comment(self, inode: int, comment: str):
+        if self.get_comment(inode):
+            self.cur.execute(
+                '''UPDATE comment SET comment=? WHERE inode=?;''',
+                (inode, comment)
+            )
+        else:
+            self.cur.execute(
+                '''INSERT INTO comment (inode, comment) VALUES(?,?)''',
+                (inode, comment)
+            )
+        self.con.commit()
+
+    def get_comment(self, inode: int) -> tuple[str]:
+        inodes = list(self.cur.execute(
+            '''SELECT comment FROM comment WHERE inode=?''',
+            (inode,)
+        ))
+        return inodes[0] if inodes else None
+
     def add_tag(self, inode: int, tag: str) -> None:
         if self.has_tag(inode, tag):
             return None
         self.cur.execute(
-            '''INSERT INTO inode VALUES(?,?);''',
+            '''INSERT INTO inode (id, inode) VALUES(?,?);''',
             (self._tag2id(tag), inode)
         )
         self.con.commit()
