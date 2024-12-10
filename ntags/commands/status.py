@@ -6,7 +6,7 @@ from ..lib.dbclass import (
 )
 
 
-def status_command(from_root: bool = False):
+def status_command():
     print_status(
         DataBase(check_tagdb(DEFAULT_TAGDB_FNAME))
     )

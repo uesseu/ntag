@@ -4,9 +4,10 @@ from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, get_inode, check_tagdb
 from ..lib.color import format_color
 from ..lib.ninpipe import Pipe
 from os.path import exists
+import sys
 
 
-def show_command(from_root: bool = False):
+def show_command():
     argparse.ArgumentParser(
         usage='''Command to show tags by path.
 Example:
@@ -17,6 +18,18 @@ Example:
             if not fname:
                 break
             if exists(fname):
-                tags = db.inode2tag(get_inode(fname))
+                inode = get_inode(fname)
+                tags = db.inode2tag(inode)
                 ftags = [format_color(*tag) for tag in tags]
-                print(fname, '[', ' '.join(ftags), ']')
+                sys.stdout.write(fname)
+                ftags = [format_color(*tag) for tag in
+                         db.inode2tag(get_inode(fname))]
+                sys.stdout.write('[ ')
+                sys.stdout.write(' '.join(ftags))
+                sys.stdout.write(' ]')
+                comment = db.get_comment(inode)
+                if comment:
+                    sys.stdout.write(': ')
+                    sys.stdout.write(comment[0])
+                sys.stdout.write('\n')
+                sys.stdout.flush()

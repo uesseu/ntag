@@ -4,7 +4,7 @@ from ..lib.ninpipe import Pipe
 from argparse import ArgumentParser
 
 
-def add_command(from_root: bool = False):
+def add_command():
     parser = ArgumentParser(
         usage='''Add a tag to file.
 It reads fname from stdin.

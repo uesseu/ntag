@@ -12,6 +12,8 @@ from .remove import remove_command
 from .show import show_command
 from .status import status_command
 from .io import export_command, import_command
+from .comment import addcomment_command
+from .comment import getcomment_command
 
 commands = {}
 commands['export'] = export_command
@@ -26,6 +28,8 @@ commands['make'] = make_command
 commands['remove'] = remove_command
 commands['show'] = show_command
 commands['status'] = status_command
+commands['add_comment'] = addcomment_command
+commands['get_comment'] = getcomment_command
 
 
 def main():

@@ -3,7 +3,7 @@ from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, check_tagdb
 from ..lib.misc import get_tag_from_arg
 
 
-def rename_command(from_root: bool = False):
+def rename_command():
     parser = ArgumentParser(
         usage='''Rename tag.
 

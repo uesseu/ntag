@@ -14,7 +14,7 @@ def input_int(num_range) -> int:
             print('Please write number')
 
 
-def color_command(from_root: bool = False) -> None:
+def color_command() -> None:
     print('Write tag number in this list')
     with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
         taglist = list(db.get_taglist())
