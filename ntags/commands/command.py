@@ -53,4 +53,8 @@ filter : Filter by tag
 list   : Show list of all the tag
 remove : Remove tag from file
 show   : Show files with tag
+
+# Use comments
+add_comment : Add comment to file
+get_comment : Get comment from file
 ''')
