@@ -2,6 +2,7 @@
 from ..lib.dbclass import DataBase, get_inode, check_tagdb, DEFAULT_TAGDB_FNAME
 from ..lib.ninpipe import Pipe
 from argparse import ArgumentParser
+import sys
 
 
 def add_command():
@@ -17,8 +18,18 @@ ls ./*_good.csv | ntag-add good new''')
         'tag', nargs='*', action="extend",
         type=str, help='Tag name to delete.'
     )
+    isatty = sys.stdin.isatty()
+    if isatty:
+        parser.add_argument(
+            '-f', '--file', default='./',
+            help='File name'
+        )
     args = parser.parse_args()
     with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
-        for fname in Pipe():
+        if isatty:
             for tag in args.tag:
-                db.add_tag(get_inode(fname), tag)
+                db.add_tag(get_inode(args.file), tag)
+        else:
+            for fname in Pipe():
+                for tag in args.tag:
+                    db.add_tag(get_inode(fname), tag)
