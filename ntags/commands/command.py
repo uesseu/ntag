@@ -1,6 +1,4 @@
 import sys
-import typing
-import os
 from .add import add_command
 from .color import color_command
 from .delete import delete_command
@@ -57,6 +55,8 @@ filter : Filter by tag
 list   : Show list of all the tag
 remove : Remove tag from file
 show   : Show files with tag
+sort   : Sort result of ntag
+path   : Add or remove strings on result
 
 # Use comments
 add_comment : Add comment to file
