@@ -15,6 +15,7 @@ But I could not find such tools. That is all.
 - Only for unix like system.
   + Because it follows inode now.
   + If I or you want windows version, it may be developped.
+- Add comment for files.
 
 # Install
 
@@ -32,3 +33,24 @@ ntag -h
 ```
 ntag add -h
 ```
+
+# Command list
+## Manage tags
+init   : Initialize tag database
+make   : Make a tag
+color  : Set color of tag
+delete : Delete tag
+status : Show current status
+
+## Use tags
+add    : Add tag
+filter : Filter by tag
+list   : Show list of all the tag
+remove : Remove tag from file
+show   : Show files with tag
+sort   : Sort result of ntag
+path   : Add or remove strings on result
+
+## Use comments
+add_comment : Add comment to file
+get_comment : Get comment from file
