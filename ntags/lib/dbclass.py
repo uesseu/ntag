@@ -46,6 +46,10 @@ def get_inode(fname: str) -> int:
     return stat(Path(fname).absolute())[ST_INO]
 
 
+def get_all(fname: str) -> int:
+    return stat(Path(fname).absolute())
+
+
 def read_pipe() -> List[str]:
     file_list = []
     while True:

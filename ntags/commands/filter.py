@@ -6,7 +6,7 @@ from os.path import exists
 import sys
 from argparse import ArgumentParser
 from glob import glob
-
+from pathlib import Path
 
 def filter_command() -> None:
     parser = ArgumentParser(
@@ -31,6 +31,7 @@ ntag filter good -d ./
                         help='Invert flag.')
     parser.add_argument('-c', '--comment', action='store_true',
                         help='With comment.')
+    parser.add_argument('--parent', action='store_true')
     if isatty:
         parser.add_argument(
             '-d', '--directory', default='./',
@@ -53,8 +54,10 @@ ntag filter good -d ./
                 continue
             sys.stdout.write(fname)
             if sys.stdout.isatty():
-                ftags = [format_color(*tag) for tag in
-                         db.inode2tag(get_inode(fname))]
+                ftags = [
+                    format_color(*tag) for tag in
+                    db.inode2tag(get_inode(fname))
+                ]
                 sys.stdout.write(' [ ')
                 sys.stdout.write(' '.join(ftags))
                 sys.stdout.write(' ]')

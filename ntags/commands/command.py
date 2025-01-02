@@ -14,6 +14,8 @@ from .status import status_command
 from .io import export_command, import_command
 from .comment import addcomment_command
 from .comment import getcomment_command
+from .sort import sort_command
+from .path import path_command
 
 commands = {}
 commands['export'] = export_command
@@ -27,6 +29,8 @@ commands['list'] = list_command
 commands['make'] = make_command
 commands['remove'] = remove_command
 commands['show'] = show_command
+commands['path'] = path_command
+commands['sort'] = sort_command
 commands['status'] = status_command
 commands['add_comment'] = addcomment_command
 commands['get_comment'] = getcomment_command
