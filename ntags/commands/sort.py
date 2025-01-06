@@ -52,7 +52,7 @@ Example:
 
     lines = [
         (n, stat(n)[st_time]) for n in
-        (glob(args.directory + '/*') if stdin.isatty
+        (glob(args.directory + '/*') if stdin.isatty()
          else stdin.read().splitlines())
     ]
 

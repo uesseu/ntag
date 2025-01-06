@@ -67,4 +67,3 @@ ntag filter good -d ./
                     sys.stdout.write(': ')
                     sys.stdout.write(comment[0])
             sys.stdout.write('\n')
-            sys.stdout.flush()
