@@ -35,7 +35,8 @@ Example:
                 break
             if not exists(fname):
                 continue
-            inode = get_inode(fname)
-            sys.stdout.write(db.get_comment(inode)[0])
+            comment = db.get_comment(get_inode(fname))
+            comment = comment[0] if comment else ''
+            sys.stdout.write(comment)
             sys.stdout.write('\n')
             sys.stdout.flush()
