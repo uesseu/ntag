@@ -25,7 +25,11 @@ def export_command():
                 else:
                     fname_dict.update({tag[0]: [fname]})
         print(json.dumps(
-            {'tags': list(db.get_taglist()), 'files': fname_dict}
+            {
+                'os': os.uname().sysname,
+                'tags': list(db.get_taglist()),
+                'files': fname_dict
+            }
         ))
 
 
@@ -33,9 +37,10 @@ def import_command():
     db_json = json.loads(stdin.read())
     fname_dict = db_json['files']
     tags = db_json['tags']
+    same_os = db_json['os'] == os.uname().sysname != 'NT'
     with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
-        for key, value in tags:
-            db.make_new_tag(key, value)
+        for tag, color in tags:
+            db.make_new_tag(tag, color if same_os else None)
         for key, values in fname_dict.items():
             for value in values:
                 db.add_tag(get_inode(value), key)

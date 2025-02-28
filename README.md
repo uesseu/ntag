@@ -12,9 +12,8 @@ But I could not find such tools. That is all.
 - Not so light weighted, because of python.
   + But has enough speed for daily life.
 - Written for "me".
-- Only for unix like system.
-  + Because it follows inode now.
-  + If I or you want windows version, it may be developped.
+- Color is only for unix like system now.
+  + If I or you want color in windows, it may be developped.
 - Add comment for files.
 
 # Install
