@@ -14,6 +14,7 @@ from .comment import addcomment_command
 from .comment import getcomment_command
 from .sort import sort_command
 from .path import path_command
+from .cleanup import cleanup_command
 
 commands = {}
 commands['export'] = export_command
@@ -32,6 +33,7 @@ commands['sort'] = sort_command
 commands['status'] = status_command
 commands['add_comment'] = addcomment_command
 commands['get_comment'] = getcomment_command
+commands['cleanup'] = cleanup_command
 
 
 def main():
@@ -43,11 +45,12 @@ Please look subcommands for details.
 This is list of subcommands.
 
 # Manage tags
-init   : Initialize tag database
-make   : Make a tag
-color  : Set color of tag
-delete : Delete tag
-status : Show current status
+init    : Initialize tag database
+make    : Make a tag
+color   : Set color of tag
+delete  : Delete tag
+status  : Show current status
+cleanup : Clean up unused tags
 
 # Use tags
 add    : Add tag
