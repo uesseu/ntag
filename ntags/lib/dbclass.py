@@ -42,8 +42,9 @@ def check_tagdb(fname: str) -> str:
     return str(db_fname)
 
 
-def get_inode(fname: str) -> int:
-    return stat(Path(fname).absolute())[ST_INO]
+def get_inode(fname: str) -> Optional[int]:
+    if exists(fname):
+        return stat(Path(fname).absolute())[ST_INO]
 
 
 def get_all(fname: str) -> int:
@@ -64,7 +65,7 @@ def read_pipe() -> List[str]:
 
 class DataBase:
     def __init__(self, fname: str):
-        self.db_fname = fname
+        self.db_fname = check_tagdb(fname)
         self._to_make_new: bool = False if exists(fname) else True
         if not Path(self.db_fname).parent.exists():
             raise FileNotFoundError(
