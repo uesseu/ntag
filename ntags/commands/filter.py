@@ -32,13 +32,12 @@ ntag filter good -d ./
     parser.add_argument('-c', '--comment', action='store_true',
                         help='With comment.')
     parser.add_argument('--parent', action='store_true')
-    if isatty:
-        parser.add_argument(
-            '-d', '--directory', default='./',
-            help='Directory path to read.'
-            ' This option can be used only when'
-            ' you are using it from tty.'
-        )
+    parser.add_argument(
+        '-d', '--directory', default='./',
+        help='Directory path to read.'
+        ' This option can be used only when'
+        ' you are using it from tty.'
+    )
     args = parser.parse_args()
 
     with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
