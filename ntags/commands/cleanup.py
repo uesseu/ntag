@@ -33,6 +33,8 @@ def cleanup_command():
                 else:
                     fname_dict.update({tag[0]: [fname]})
         keys = list(fname_dict.keys())
-        for key in keys:
-            print(f'deleting [{key}]')
-            db.delete_tag(key)
+        taglist = list(db.get_taglist())
+        for tag, _ in taglist:
+            if tag not in keys:
+                print(f'deleting [{tag}]')
+                db.delete_tag(tag)
