@@ -12,6 +12,7 @@ from .status import status_command
 from .io import export_command, import_command
 from .comment import addcomment_command
 from .comment import getcomment_command
+from .comment import filtercomment_command
 from .sort import sort_command
 from .path import path_command
 from .cleanup import cleanup_command
@@ -33,6 +34,7 @@ commands['sort'] = sort_command
 commands['status'] = status_command
 commands['add_comment'] = addcomment_command
 commands['get_comment'] = getcomment_command
+commands['filter_comment'] = filtercomment_command
 commands['cleanup'] = cleanup_command
 
 
@@ -64,4 +66,5 @@ path   : Add or remove strings on result
 # Use comments
 add_comment : Add comment to file
 get_comment : Get comment from file
+filter_comment : Filter by comment
 ''')

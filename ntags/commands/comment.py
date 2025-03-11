@@ -40,3 +40,28 @@ Example:
             sys.stdout.write(comment)
             sys.stdout.write('\n')
             sys.stdout.flush()
+
+def filtercomment_command():
+    parser = ArgumentParser(
+        usage='''Filter by comment.
+Example:
+    ls | ntag filter_comment hoge''')
+    parser.add_argument('command')
+    parser.add_argument('keywords')
+    args = parser.parse_args()
+
+    with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+        for data in Pipe().async_iter():
+            fname = data.receive()
+            if not fname:
+                break
+            if not exists(fname):
+                continue
+            comment = db.get_comment(get_inode(fname))
+            comment = comment[0] if comment else ''
+            if args.keywords in comment:
+                sys.stdout.write(fname)
+                sys.stdout.write('\n')
+                sys.stdout.flush()
+
+
