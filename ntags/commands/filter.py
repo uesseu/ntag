@@ -32,15 +32,16 @@ ntag filter good -d ./
                         help='With comment.')
     parser.add_argument('--parent', action='store_true')
     parser.add_argument(
-        '-d', '--directory', default='./',
+        '-d', '--directory', default=None,
         help='Directory path to read.'
         ' This option prevents readlines from stdin.'
     )
     args = parser.parse_args()
 
     with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
-        isatty = sys.stdin.isatty() or args.directory != './'
-        fnames = glob(args.directory + '/*') if isatty else Pipe().async_iter()
+        isatty = sys.stdin.isatty() or args.directory is not None
+        directory = args.directory if args.directory else './'
+        fnames = glob(directory + '/*') if isatty else Pipe().async_iter()
         for data in fnames:
             fname = data if isatty else data.receive()
             if not fname:
