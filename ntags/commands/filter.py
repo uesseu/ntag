@@ -24,7 +24,6 @@ Example.
 ls ./*_good.csv | ntag filter good
 ntag filter good -d ./
 ''')
-    isatty = sys.stdin.isatty()
     parser.add_argument('command', help='Sub command.')
     parser.add_argument('tag', nargs='*', help='Tag name to show.')
     parser.add_argument('-v', '--invert', action='store_true',
@@ -35,12 +34,12 @@ ntag filter good -d ./
     parser.add_argument(
         '-d', '--directory', default='./',
         help='Directory path to read.'
-        ' This option can be used only when'
-        ' you are using it from tty.'
+        ' This option prevents readlines from stdin.'
     )
     args = parser.parse_args()
 
     with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+        isatty = sys.stdin.isatty() or args.directory != './'
         fnames = glob(args.directory + '/*') if isatty else Pipe().async_iter()
         for data in fnames:
             fname = data if isatty else data.receive()
