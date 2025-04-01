@@ -170,11 +170,11 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
         if self.get_comment(inode):
             self.cur.execute(
                 '''UPDATE comment SET comment=? WHERE inode=?;''',
-                (inode, comment)
+                (comment, inode)
             )
         else:
             self.cur.execute(
-                '''INSERT INTO comment (inode, comment) VALUES(?,?)''',
+                '''INSERT INTO comment (inode, comment) VALUES(?,?);''',
                 (inode, comment)
             )
         self.con.commit()
