@@ -7,6 +7,7 @@ Because I wanted such CLI tools Like "FenrirFS".
 But I could not find such tools. That is all.
 
 # Feature
+
 - Made by python and sqlite3.
 - Tag does not removed even if file is moved.
 - Not so light weighted, because of python.
@@ -35,21 +36,25 @@ ntag add -h
 
 # Command list
 ## Manage tags
-init   : Initialize tag database
-make   : Make a tag
-color  : Set color of tag
-delete : Delete tag
-status : Show current status
+
+- init   : Initialize tag database
+- make   : Make a tag
+- color  : Set color of tag
+- delete : Delete tag
+- status : Show current status
 
 ## Use tags
-add    : Add tag
-filter : Filter by tag
-list   : Show list of all the tag
-remove : Remove tag from file
-show   : Show files with tag
-sort   : Sort result of ntag
-path   : Add or remove strings on result
+
+- add    : Add tag
+- filter : Filter by tag
+- list   : Show list of all the tag
+- remove : Remove tag from file
+- show   : Show files with tag
+- sort   : Sort result of ntag
+- path   : Add or remove strings on result
 
 ## Use comments
-add_comment : Add comment to file
-get_comment : Get comment from file
+
+- add_comment : Add comment to file
+- get_comment : Get comment from file
+- filter_comment : Filter files by comment
