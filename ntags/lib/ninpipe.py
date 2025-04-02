@@ -2,6 +2,7 @@
 from sys import stdin, stdout
 from typing import List
 from threading import Thread
+from glob import glob
 
 
 class Pipe:
@@ -21,7 +22,6 @@ class Pipe:
         '''
         self.sep = sep
         self.ended = False
-        self.num = 0
 
     def get_all_lines(self) -> List[str]:
         '''
@@ -92,11 +92,70 @@ class Pipe:
         '''
         stdout.write(data)
 
+
+class PipeFname(Pipe):
+    def __init__(self, sep: str = '\n',
+                 from_glob: bool = False, directory: str = '') -> None:
+        '''
+        sep: str
+            Separator of each lines.
+            It may be '\n' if libe based.
+            Multiple characters cannot be contained.
+        directory: str
+            Path of directory.
+            If it is not blank string, the file list
+            in the directory will be scanned and stdin
+            will be ignored.
+        '''
+        self.sep = sep
+        self.ended = False
+        self.from_glob = from_glob
+        self.directory = directory
+        self.started = False
+        self.fnum = 0
+
+    def get(self, num: int = 0) -> str:
+        '''
+        Get one line stdin.
+
+        num: int = 0
+            Length of string to read.
+            If it is 0, string will be read until 'sep' was read.
+        '''
+        if self.from_glob:
+            if not self.started:
+                self.glob_iter = iter(glob(self.directory))
+                self.started = True
+            try:
+                self.result = next(self.glob_iter)
+            except StopIteration:
+                self.ended = True
+                return ''
+            return self.result
+        if self.ended:
+            raise EOFError
+        if num != 0:
+            return stdin.read(num)
+        string: List[str] = []
+        while True:
+            data = stdin.read(1)
+            if data == '':
+                self.ended = True
+                self.result = ''.join(string)
+                return self.result
+            elif data == self.sep:
+                self.result = ''.join(string)
+                return self.result
+            else:
+                string.append(data)
+
+
 class AsyncPipe:
     '''
     Asynchronous version of Pipe class.
     It should be called by Pipe class.
     '''
+
     def __init__(self, pipe: Pipe) -> None:
         self.pipe = pipe
 

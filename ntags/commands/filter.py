@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, get_inode, check_tagdb
 from ..lib.color import format_color
-from ..lib.ninpipe import Pipe
+from ..lib.ninpipe import PipeFname
 from os.path import exists
 import sys
 from argparse import ArgumentParser
-from glob import glob
-from pathlib import Path
+
 
 def filter_command() -> None:
     parser = ArgumentParser(
@@ -39,11 +38,12 @@ ntag filter good -d ./
     args = parser.parse_args()
 
     with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
-        isatty = sys.stdin.isatty() or args.directory is not None
-        directory = args.directory if args.directory else './'
-        fnames = glob(directory + '/*') if isatty else Pipe().async_iter()
+        fnames = PipeFname(
+            from_glob=sys.stdin.isatty() or args.directory is not None,
+            directory=(args.directory + '/*') if args.directory else './*'
+        ).async_iter()
         for data in fnames:
-            fname = data if isatty else data.receive()
+            fname = data.receive()
             if not fname:
                 break
             if not exists(fname):
