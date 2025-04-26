@@ -4,9 +4,8 @@ from os.path import exists
 from logging import getLogger, INFO, DEBUG
 from pathlib import Path
 import sys
-from os import stat, environ, DirEntry
+from os import stat, environ
 from stat import ST_INO
-from glob import glob
 logger = getLogger()
 logger.setLevel(INFO)
 DEFAULT_TAGDB_FNAME = '.nintag_db'
@@ -237,5 +236,6 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
 def print_status(db: DataBase) -> None:
     if 'NINTAG_DB' in environ:
         print('NINTAG_DB:',
-              environ['NINTAG_DB'], '\n  Environment of NINTAG_DB')
-    print('Path of current database:', db.db_fname)
+              environ['NINTAG_DB'],
+              '\n  Environment of NINTAG_DB')
+    print('Path of current database:', Path(db.db_fname).absolute())
