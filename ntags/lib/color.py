@@ -1,4 +1,5 @@
 from typing import Dict, cast
+import os
 
 prefix = '\033['
 suffix = 'm'
@@ -50,6 +51,8 @@ def encode_color(attribute: str = 'RESET', color: str = 'DEFAULT',
 
 
 def format_color(fname: str, color: str) -> str:
+    if os.uname == 'NT':
+        return fname
     if color is None:
         return fname
     return cast(str, color + fname + encode_color('RESET'))
