@@ -67,4 +67,8 @@ path   : Add or remove strings on result
 add_comment : Add comment to file
 get_comment : Get comment from file
 filter_comment : Filter by comment
+
+# Import and export
+export : Export tag dababase as json.
+import : Import tag dababase from json.
 ''')
