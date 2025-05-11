@@ -1,5 +1,14 @@
 from typing import Dict, cast
-import os
+import platform
+if platform.system() == 'Windows':
+    from ctypes import windll, wintypes, byref
+    handle = windll.kernel32.GetStdHandle(-11)
+    windll.kernel32.SetConsoleMode(
+        handle,
+        windll.kernel32.GetConsoleMode(handle, byref(wintypes.DWORD()))
+        | 0x0004
+    )
+
 
 prefix = '\033['
 suffix = 'm'
@@ -51,8 +60,6 @@ def encode_color(attribute: str = 'RESET', color: str = 'DEFAULT',
 
 
 def format_color(fname: str, color: str) -> str:
-    if os.uname == 'NT':
-        return fname
     if color is None:
         return fname
     return cast(str, color + fname + encode_color('RESET'))
