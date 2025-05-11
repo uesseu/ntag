@@ -1,5 +1,5 @@
 # ntags
-A python package to enable tag style command line file management.
+A lite weight python package to enable tag style command line file management.
 Written for my daily life.
 
 # Why?
@@ -12,10 +12,12 @@ But I could not find such tools. That is all.
 - Tag does not removed even if file is moved.
 - Not so light weighted, because of python.
   + But has enough speed for daily life.
-- Written for "me".
 - Color is only for unix like system now.
-  + If I or you want color in windows, it may be developped.
 - Add comment for files.
+- Written for "me".
+
+
+I am a heavy user of ntag and this is the only fact which may give it reliability.
 
 # Install
 
