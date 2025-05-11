@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME
+from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, check_tagdb
 from argparse import ArgumentParser
 
 
@@ -13,5 +13,5 @@ def init_command(from_root: bool = False):
     parser.add_argument('command', help='Sub command of ntag.')
     parser.parse_args()
 
-    db = DataBase(DEFAULT_TAGDB_FNAME)
+    db = DataBase(check_tagdb(DEFAULT_TAGDB_FNAME))
     db.close()

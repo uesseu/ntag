@@ -31,7 +31,7 @@ def check_tagdb(fname: str) -> str:
     '''
     db_fname: Union[Path, str, None] = None
     if 'NINTAG_DB' in environ:
-        db_fname = environ['NINTAG_DB']
+        db_fname = find_tagdb_inparents(environ['NINTAG_DB'])
     else:
         db_fname = find_tagdb_inparents(fname)
     if db_fname is None:
