@@ -21,7 +21,7 @@ def find_tagdb_inparents(fname: str) -> Optional[Path]:
         dbpath = path / fname
         if dbpath.exists():
             return dbpath
-    return None
+    return fname
 
 
 def check_tagdb(fname: str) -> str:
