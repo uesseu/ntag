@@ -11,7 +11,8 @@ def remove_command():
 The file names should be read from stdin.
 
 Example.
-# Delete all the tag named "hoge".
+Delete tag named "hoge" from path.
+
 ls | ntag filter tag-name | ntag remove tag-name
 ntag remove tag-name file-name''')
     parser.add_argument('command', help='Sub command.')
