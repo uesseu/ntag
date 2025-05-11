@@ -11,7 +11,7 @@ with open('README.md') as f:
 with open('LICENSE') as f:
     license = f.read()
 
-VERSION = '0.0.1'
+VERSION = '0.0.2'
 
 setup(
     name='ntags',
