@@ -3,6 +3,7 @@ from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, get_inode, check_tagdb
 from ..lib.color import format_color
 from ..lib.ninpipe import PipeFname
 from os.path import exists
+from pathlib import Path
 import sys
 from argparse import ArgumentParser
 
@@ -29,6 +30,10 @@ ntag filter good -d ./
                         help='Invert flag.')
     parser.add_argument('-c', '--comment', action='store_true',
                         help='With comment.')
+    parser.add_argument('-f', '--fileonly', action='store_true',
+                        help='Show files only.')
+    parser.add_argument('-t', '--dironly', action='store_true',
+                        help='Show directories only.')
     parser.add_argument('--parent', action='store_true')
     parser.add_argument(
         '-d', '--directory', default=None,
@@ -46,7 +51,12 @@ ntag filter good -d ./
             fname = data.receive()
             if not fname:
                 break
-            if not exists(fname):
+            path = Path(fname)
+            if not path.exists():
+                continue
+            if args.dironly and not path.is_dir():
+                continue
+            if args.fileonly and not path.is_file():
                 continue
             inode = get_inode(fname)
             if args.tag and not args.invert ^ db.has_tags(inode, args.tag):
