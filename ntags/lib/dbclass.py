@@ -5,7 +5,7 @@ from logging import getLogger, INFO, DEBUG
 from pathlib import Path
 import sys
 from os import stat, environ
-from stat import ST_INO
+from stat import ST_INO, ST_GID, ST_SIZE, ST_CTIME, ST_MTIME, ST_ATIME, ST_NLINK, ST_MODE, ST_DEV, ST_UID
 logger = getLogger()
 logger.setLevel(INFO)
 DEFAULT_TAGDB_FNAME = '.nintag_db'
@@ -39,6 +39,24 @@ def check_tagdb(fname: str) -> str:
         print('Consider "ntag init" to make it in current directory.')
         sys.exit()
     return str(db_fname)
+
+
+class Stat:
+    def __init__(self, fname):
+        self.fname = fname
+        self.inode = None
+        self.size = None
+        self.uid = None
+        self.gid = None
+        self.load()
+
+    def load(self):
+        if exists(self.fname):
+            self.stat = stat(Path(self.fname).absolute())
+            self.inode = self.stat[ST_INO]
+            self.size = self.stat[ST_SIZE]
+            self.uid = self.stat[ST_UID]
+            self.gid = self.stat[ST_GID]
 
 
 def get_inode(fname: str) -> Optional[int]:
