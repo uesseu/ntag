@@ -22,6 +22,7 @@ class Pipe:
         '''
         self.sep = sep
         self.ended = False
+        self.result = None
 
     def get_all_lines(self) -> List[str]:
         '''
@@ -113,6 +114,7 @@ class PipeFname(Pipe):
         self.directory = directory
         self.started = False
         self.fnum = 0
+        self.result = None
 
     def get(self, num: int = 0) -> str:
         '''
