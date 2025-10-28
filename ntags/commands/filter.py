@@ -64,7 +64,7 @@ ntag filter good -d ./
             stat = Stat(fname)
             upper = get_number_unit(args.upper)
             lower = get_number_unit(args.lower)
-            if (stat.size > upper.as_byte or stat.size < lower.as_byte) and upper.as_byte != 0:
+            if (stat.size > upper.as_byte  and upper.as_byte != 0 or stat.size < lower.as_byte):
                 continue
             if args.tag and not args.invert ^ db.has_tags(stat.inode, args.tag):
                 continue
