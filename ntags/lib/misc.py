@@ -41,10 +41,12 @@ class ByteUnit:
     def get_byte_order(self):
         if self.unit_is(['', 'byte', 'b']):
             return 1
-        if self.unit_is(['mb', 'm', 'megabyte', 'mbyte']):
+        if self.unit_is(['kb', 'k', 'kilobyte', 'kbyte']):
             return 1024
-        if self.unit_is(['gb', 'g', 'gigabyte', 'gbyte']):
+        if self.unit_is(['mb', 'm', 'megabyte', 'mbyte']):
             return 1024 ** 2
+        if self.unit_is(['gb', 'g', 'gigabyte', 'gbyte']):
+            return 1024 ** 3
         return 0
 
 
