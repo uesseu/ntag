@@ -25,7 +25,7 @@ def path_command():
     ]
 
     if stdout.isatty():
-        with DataBase(DEFAULT_TAGDB_FNAME) as db:
+        with DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '') as db:
             for n in lines:
                 path = Path(n[0]) / args.path
                 if args.absolute:

@@ -8,10 +8,10 @@ from ..lib.dbclass import (
 
 def status_command():
     print_status(
-        DataBase(DEFAULT_TAGDB_FNAME)
+        DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '')
     )
     print('List of tags')
-    with DataBase(DEFAULT_TAGDB_FNAME) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '') as db:
         for tag, color in db.get_taglist():
             if tag is not None:
                 print(' ' * 2 + format_color(tag, color))

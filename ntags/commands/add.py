@@ -27,7 +27,7 @@ ls ./*_good.csv | ntag-add good new''')
             help='File name'
         )
     args = parser.parse_args()
-    with DataBase(DEFAULT_TAGDB_FNAME) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME, args.directory and args.relative) as db:
         if isatty:
             for tag in args.tag:
                 db.add_tag(get_inode(args.file), tag)

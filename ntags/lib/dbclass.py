@@ -14,10 +14,10 @@ logger.setLevel(INFO)
 DEFAULT_TAGDB_FNAME = '.nintag_db'
 
 
-def find_tagdb_inparents(fname: str, directory: str = '') -> Optional[Path]:
+def find_tagdb_inparents(fname: str, directory: str | None = None) -> Optional[Path]:
     '''Returns file name of database in parent directories.
     If there is no database file, returns None.'''
-    filepath = Path(directory) / fname if directory else Path('.') / fname
+    filepath = Path(directory if directory else '.') / fname
     if filepath.exists():
         return filepath
     for path in filepath.absolute().parents:
@@ -27,14 +27,13 @@ def find_tagdb_inparents(fname: str, directory: str = '') -> Optional[Path]:
     return None
 
 
-def check_tagdb(fname: str, directory: str = '') -> str:
+def check_tagdb(fname: str, directory: str | None = None) -> str:
     '''
     Find tag file and returns the name.
     It kills this program itself if there is no tag file.
     '''
-    db_fname: Union[Path, str, None] = None
     fname = environ['NINTAG_DB'] if 'NINTAG_DB' in environ else fname
-    db_fname = find_tagdb_inparents(fname, directory)
+    db_fname: Path | None = find_tagdb_inparents(fname, directory)
     if db_fname is None:
         print('Database is not made yet.')
         print('Consider "ntag init" to make it in current directory.')
@@ -82,8 +81,8 @@ def read_pipe() -> List[str]:
 
 
 class DataBase:
-    def __init__(self, fname: str):
-        self.db_fname = check_tagdb(fname)
+    def __init__(self, fname: str, directory: str | None = None):
+        self.db_fname = check_tagdb(fname, directory)
         self._to_make_new: bool = False if exists(fname) else True
         if not Path(self.db_fname).parent.exists():
             raise FileNotFoundError(

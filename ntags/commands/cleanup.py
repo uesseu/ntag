@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-from ..lib.dbclass import DataBase, get_inode, check_tagdb, DEFAULT_TAGDB_FNAME
-from ..lib.ninpipe import Pipe
+from ..lib.dbclass import DataBase, get_inode, DEFAULT_TAGDB_FNAME
 from argparse import ArgumentParser
 from multiprocessing import Pool
 import os
 from itertools import chain
+
 
 def _get_inode_fname(data):
     paths = [os.path.join(data[0], p) for p in data[1]]\
@@ -13,16 +13,14 @@ def _get_inode_fname(data):
 
 
 def cleanup_command():
-    parser = ArgumentParser(
+    ArgumentParser(
         usage='''Remove unused tags.
 
 Example.
 ntag cleanup
 ''')
-
-def cleanup_command():
     fname_dict = {}
-    with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME) as db:
         with Pool(min(os.cpu_count(), 8)) as p:
             inode_file_list = p.map(_get_inode_fname, os.walk('.'))
         for inode, fname in chain.from_iterable(inode_file_list):

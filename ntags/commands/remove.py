@@ -25,11 +25,11 @@ ntag remove tag-name file-name''')
     args = parser.parse_args()
     if stdin.isatty():
         fname = args.fname
-        with DataBase(DEFAULT_TAGDB_FNAME) as db:
+        with DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '') as db:
             for tag in args.tag:
                 db.remove_tag_from_inode(tag, get_inode(fname))
     else:
-        with DataBase(DEFAULT_TAGDB_FNAME) as db:
+        with DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '') as db:
             for fname in Pipe():
                 for tag in args.tag:
                     db.remove_tag_from_inode(tag, get_inode(fname))

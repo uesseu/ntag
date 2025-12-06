@@ -41,7 +41,7 @@ ntag filter good -d ./
     set_custom_directory(parser)
     args = parser.parse_args()
 
-    with DataBase(DEFAULT_TAGDB_FNAME) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '') as db:
         fnames = PipeFname(
             from_glob=sys.stdin.isatty() or args.directory is not None,
             directory=(args.directory + '/*') if args.directory else './*'

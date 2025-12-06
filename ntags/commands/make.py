@@ -18,5 +18,5 @@ def make_command():
     if sys.stdin.isatty():
         print('Please enter a name of tag.')
     tagname = next(Pipe())
-    with DataBase(DEFAULT_TAGDB_FNAME) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '') as db:
         db.make_new_tag(tagname)

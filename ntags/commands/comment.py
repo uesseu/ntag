@@ -19,7 +19,7 @@ ls ./*_good.csv | ntag add_comment 'It is a special file.' ''')
     parser.add_argument('comment', type=str, help='Comment.')
     set_custom_directory(parser)
     args = parser.parse_args()
-    with DataBase(DEFAULT_TAGDB_FNAME) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME, args.directory and args.relative) as db:
         for fname in Pipe():
             if exists(fname):
                 db.add_comment(get_inode(fname), args.comment)
@@ -33,7 +33,7 @@ Example:
     parser.add_argument('command')
     set_custom_directory(parser)
     args = parser.parse_args()
-    with DataBase(DEFAULT_TAGDB_FNAME) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '') as db:
         fnames = PipeFname(
             from_glob=sys.stdin.isatty() or args.directory is not None,
             directory=(args.directory + '/*') if args.directory else './*'

@@ -17,7 +17,7 @@ def input_int(num_range) -> int:
 
 def color_command() -> None:
     print('Write tag number in this list')
-    with DataBase(DEFAULT_TAGDB_FNAME) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME, args.directory and args.relative) as db:
         taglist = list(db.get_taglist())
         for num, (tagname, color) in enumerate(taglist):
             if tagname is not None:
@@ -47,7 +47,7 @@ def color_command() -> None:
         for num, key in enumerate(bgcolor_list))
           )
     bgcolor_num = input_int(len(bgcolor_list))
-    with DataBase(DEFAULT_TAGDB_FNAME) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '') as db:
         db.set_color(
             taglist[tag_number][0],
             encode_color(
