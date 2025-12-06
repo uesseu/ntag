@@ -5,7 +5,10 @@ from logging import getLogger, INFO, DEBUG
 from pathlib import Path
 import sys
 from os import stat, environ
-from stat import ST_INO, ST_GID, ST_SIZE, ST_CTIME, ST_MTIME, ST_ATIME, ST_NLINK, ST_MODE, ST_DEV, ST_UID
+from stat import (
+    ST_INO, ST_GID, ST_SIZE, ST_CTIME, ST_MTIME,
+    ST_ATIME, ST_NLINK, ST_MODE, ST_DEV, ST_UID
+)
 logger = getLogger()
 logger.setLevel(INFO)
 DEFAULT_TAGDB_FNAME = '.nintag_db'
@@ -14,7 +17,7 @@ DEFAULT_TAGDB_FNAME = '.nintag_db'
 def find_tagdb_inparents(fname: str, directory: str = '') -> Optional[Path]:
     '''Returns file name of database in parent directories.
     If there is no database file, returns None.'''
-    filepath = if directory Path(directory) / fname else Path('.') / fname
+    filepath = Path(directory) / fname if directory else Path('.') / fname
     if filepath.exists():
         return filepath
     for path in filepath.absolute().parents:
