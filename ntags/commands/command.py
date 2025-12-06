@@ -7,7 +7,6 @@ from .init import init_command
 from .list import list_command
 from .make import make_command
 from .remove import remove_command
-from .show import show_command
 from .status import status_command
 from .io import export_command, import_command
 from .comment import addcomment_command
@@ -28,7 +27,6 @@ commands['init'] = init_command
 commands['list'] = list_command
 commands['make'] = make_command
 commands['remove'] = remove_command
-commands['show'] = show_command
 commands['path'] = path_command
 commands['sort'] = sort_command
 commands['status'] = status_command
@@ -59,7 +57,6 @@ add    : Add tag
 filter : Filter by tag
 list   : Show list of all the tag
 remove : Remove tag from file
-show   : Show files with tag
 sort   : Sort result of ntag
 path   : Add or remove strings on result
 
