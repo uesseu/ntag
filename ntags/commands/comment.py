@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-from ..lib.dbclass import DataBase, get_inode, check_tagdb, DEFAULT_TAGDB_FNAME
+from ..lib.dbclass import DataBase, get_inode, DEFAULT_TAGDB_FNAME
 from ..lib.ninpipe import Pipe, PipeFname
+from ..lib.misc import set_custom_directory
 from argparse import ArgumentParser
 from os.path import exists
 import sys
@@ -16,13 +17,9 @@ Example.
 ls ./*_good.csv | ntag add_comment 'It is a special file.' ''')
     parser.add_argument('command', help='Sub command of ntag.')
     parser.add_argument('comment', type=str, help='Comment.')
-    parser.add_argument(
-        '-d', '--directory', default=None,
-        help='Directory path to read.'
-        ' This option prevents readlines from stdin.'
-    )
+    set_custom_directory(parser)
     args = parser.parse_args()
-    with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME) as db:
         for fname in Pipe():
             if exists(fname):
                 db.add_comment(get_inode(fname), args.comment)
@@ -34,13 +31,9 @@ def getcomment_command():
 Example:
     ls | ntag get_comment''')
     parser.add_argument('command')
-    parser.add_argument(
-        '-d', '--directory', default=None,
-        help='Directory path to read.'
-        ' This option prevents readlines from stdin.'
-    )
+    set_custom_directory(parser)
     args = parser.parse_args()
-    with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME) as db:
         fnames = PipeFname(
             from_glob=sys.stdin.isatty() or args.directory is not None,
             directory=(args.directory + '/*') if args.directory else './*'
@@ -65,14 +58,10 @@ Example:
     ls | ntag filter_comment hoge''')
     parser.add_argument('command')
     parser.add_argument('keywords')
-    parser.add_argument(
-        '-d', '--directory', default=None,
-        help='Directory path to read.'
-        ' This option prevents readlines from stdin.'
-    )
+    set_custom_directory(parser)
     args = parser.parse_args()
 
-    with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME) as db:
         fnames = PipeFname(
             from_glob=sys.stdin.isatty() or args.directory is not None,
             directory=(args.directory + '/*') if args.directory else './*'

@@ -1,4 +1,4 @@
-from ..lib.dbclass import DataBase, get_inode, check_tagdb, DEFAULT_TAGDB_FNAME
+from ..lib.dbclass import DataBase, get_inode, DEFAULT_TAGDB_FNAME
 from sys import stdin
 import json
 from multiprocessing import Pool
@@ -14,7 +14,7 @@ def _get_inode_fname(data):
 
 def export_command():
     fname_dict = {}
-    with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME) as db:
         with Pool(min(os.cpu_count(), 8)) as p:
             inode_file_list = p.map(_get_inode_fname, os.walk('.'))
         for inode, fname in chain.from_iterable(inode_file_list):
@@ -38,7 +38,7 @@ def import_command():
     fname_dict = db_json['files']
     tags = db_json['tags']
     same_os = db_json['os'] == os.uname().sysname != 'NT'
-    with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME) as db:
         for tag, color in tags:
             db.make_new_tag(tag, color if same_os else None)
         for key, values in fname_dict.items():

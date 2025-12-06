@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, get_inode, check_tagdb, Stat
+from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, Stat
 from ..lib.color import format_color
-from ..lib.misc import get_number_unit
+from ..lib.misc import get_number_unit, set_custom_directory
 from ..lib.ninpipe import PipeFname
-from os.path import exists
 from pathlib import Path
 import sys
 from argparse import ArgumentParser
@@ -36,16 +35,13 @@ ntag filter good -d ./
     parser.add_argument('-t', '--dironly', action='store_true',
                         help='Show directories only.')
     parser.add_argument('-u', '--upper', default='', help='Max size of file.')
-    parser.add_argument('-l', '--lower', default='', help='Minimum size of file.')
+    parser.add_argument('-l', '--lower', default='',
+                        help='Minimum size of file.')
     parser.add_argument('--parent', action='store_true')
-    parser.add_argument(
-        '-d', '--directory', default=None,
-        help='Directory path to read.'
-        ' This option prevents readlines from stdin.'
-    )
+    set_custom_directory(parser)
     args = parser.parse_args()
 
-    with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME) as db:
         fnames = PipeFname(
             from_glob=sys.stdin.isatty() or args.directory is not None,
             directory=(args.directory + '/*') if args.directory else './*'
@@ -64,9 +60,16 @@ ntag filter good -d ./
             stat = Stat(fname)
             upper = get_number_unit(args.upper)
             lower = get_number_unit(args.lower)
-            if (stat.size > upper.as_byte  and upper.as_byte != 0 or stat.size < lower.as_byte):
+            if (
+                stat.size > upper.as_byte
+                and upper.as_byte != 0
+                or stat.size < lower.as_byte
+            ):
                 continue
-            if args.tag and not args.invert ^ db.has_tags(stat.inode, args.tag):
+            if (
+                args.tag
+                and not args.invert ^ db.has_tags(stat.inode, args.tag)
+            ):
                 continue
             sys.stdout.write(fname)
             if sys.stdout.isatty():

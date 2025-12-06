@@ -1,4 +1,4 @@
-from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, get_inode, check_tagdb
+from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, get_inode
 from ..lib.color import format_color
 from argparse import ArgumentParser
 from sys import stdin, stdout
@@ -25,7 +25,7 @@ def path_command():
     ]
 
     if stdout.isatty():
-        with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+        with DataBase(DEFAULT_TAGDB_FNAME) as db:
             for n in lines:
                 path = Path(n[0]) / args.path
                 if args.absolute:

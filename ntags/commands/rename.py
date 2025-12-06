@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, check_tagdb
+from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME
 from ..lib.misc import get_tag_from_arg
 
 
@@ -14,5 +14,5 @@ Example.
     parser.add_argument('tag', help='Tag name to delete.')
     args = parser.parse_args()
 
-    with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME) as db:
         db.rename_tag(tag, input())

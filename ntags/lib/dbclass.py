@@ -11,29 +11,27 @@ logger.setLevel(INFO)
 DEFAULT_TAGDB_FNAME = '.nintag_db'
 
 
-def find_tagdb_inparents(fname: str) -> Optional[Path]:
+def find_tagdb_inparents(fname: str, directory: str = '') -> Optional[Path]:
     '''Returns file name of database in parent directories.
     If there is no database file, returns None.'''
-    current_dir_filepath = Path('.') / fname
-    if current_dir_filepath.exists():
-        return current_dir_filepath
-    for path in Path('.').absolute().parents:
+    filepath = if directory Path(directory) / fname else Path('.') / fname
+    if filepath.exists():
+        return filepath
+    for path in filepath.absolute().parents:
         dbpath = path / fname
         if dbpath.exists():
             return dbpath
-    return fname
+    return None
 
 
-def check_tagdb(fname: str) -> str:
+def check_tagdb(fname: str, directory: str = '') -> str:
     '''
     Find tag file and returns the name.
     It kills this program itself if there is no tag file.
     '''
     db_fname: Union[Path, str, None] = None
-    if 'NINTAG_DB' in environ:
-        db_fname = find_tagdb_inparents(environ['NINTAG_DB'])
-    else:
-        db_fname = find_tagdb_inparents(fname)
+    fname = environ['NINTAG_DB'] if 'NINTAG_DB' in environ else fname
+    db_fname = find_tagdb_inparents(fname, directory)
     if db_fname is None:
         print('Database is not made yet.')
         print('Consider "ntag init" to make it in current directory.')

@@ -1,5 +1,6 @@
-from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, get_inode, check_tagdb
+from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, get_inode
 from ..lib.color import format_color
+from ..lib.misc import set_custom_directory
 from argparse import ArgumentParser
 from sys import stdin, stdout
 from stat import ST_CTIME, ST_ATIME, ST_MTIME
@@ -33,9 +34,7 @@ Example:
     parser.add_argument(
         '-e', '--end', help='End of the items. It can be less than -1.',
         type=int, default=0)
-    parser.add_argument(
-        '-d', '--directory', help='Directory to look.',
-        default='./')
+    set_custom_directory(parser)
     parser.add_argument(
         '-v', '--invert', help='Invert the sort',
         action='store_true')
@@ -62,7 +61,7 @@ Example:
         in sorted(lines, key=lambda x: x[1], reverse=args.invert)
     ][args.start:len(lines)-args.end]
     if stdout.isatty():
-        with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+        with DataBase(DEFAULT_TAGDB_FNAME) as db:
             for n in result:
                 stdout.write(n)
                 ftags = [format_color(*tag) for tag in

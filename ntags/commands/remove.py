@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, get_inode, check_tagdb
+from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, get_inode
 from ..lib.ninpipe import Pipe
 from argparse import ArgumentParser
 from sys import stdin
@@ -25,11 +25,11 @@ ntag remove tag-name file-name''')
     args = parser.parse_args()
     if stdin.isatty():
         fname = args.fname
-        with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+        with DataBase(DEFAULT_TAGDB_FNAME) as db:
             for tag in args.tag:
                 db.remove_tag_from_inode(tag, get_inode(fname))
     else:
-        with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+        with DataBase(DEFAULT_TAGDB_FNAME) as db:
             for fname in Pipe():
                 for tag in args.tag:
                     db.remove_tag_from_inode(tag, get_inode(fname))

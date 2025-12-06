@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, check_tagdb
+from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME
 from ..lib.color import COLOR, ATTRIBUTE, BG_COLOR, encode_color, format_color
+
 
 def input_int(num_range) -> int:
     while True:
@@ -16,7 +17,7 @@ def input_int(num_range) -> int:
 
 def color_command() -> None:
     print('Write tag number in this list')
-    with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME) as db:
         taglist = list(db.get_taglist())
         for num, (tagname, color) in enumerate(taglist):
             if tagname is not None:
@@ -46,7 +47,7 @@ def color_command() -> None:
         for num, key in enumerate(bgcolor_list))
           )
     bgcolor_num = input_int(len(bgcolor_list))
-    with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME) as db:
         db.set_color(
             taglist[tag_number][0],
             encode_color(

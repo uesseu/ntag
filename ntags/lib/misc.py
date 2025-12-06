@@ -65,3 +65,15 @@ def get_number_unit(text: str) -> ByteUnit:
         else:
             unit += t
     return ByteUnit(0 if number == '' else float(number), unit)
+
+
+def set_custom_directory(parser):
+    parser.add_argument(
+        '-d', '--directory', default=None,
+        help='Directory path to read.'
+        ' This option prevents readlines from stdin.'
+    )
+    parser.add_argument(
+        '-r', '--relative', action='store_true',
+        help='Load database from the relative path of "-d" option.'
+    )

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-from ..lib.dbclass import DataBase, get_inode, check_tagdb, DEFAULT_TAGDB_FNAME
+from ..lib.dbclass import DataBase, get_inode, DEFAULT_TAGDB_FNAME
 from ..lib.ninpipe import Pipe
+from ..lib.misc import set_custom_directory
 from argparse import ArgumentParser
 import sys
 
@@ -18,6 +19,7 @@ ls ./*_good.csv | ntag-add good new''')
         'tag', nargs='*', action="extend",
         type=str, help='Tag name to delete.'
     )
+    set_custom_directory(parser)
     isatty = sys.stdin.isatty()
     if isatty:
         parser.add_argument(
@@ -25,7 +27,7 @@ ls ./*_good.csv | ntag-add good new''')
             help='File name'
         )
     args = parser.parse_args()
-    with DataBase(check_tagdb(DEFAULT_TAGDB_FNAME)) as db:
+    with DataBase(DEFAULT_TAGDB_FNAME) as db:
         if isatty:
             for tag in args.tag:
                 db.add_tag(get_inode(args.file), tag)
