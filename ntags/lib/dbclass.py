@@ -23,7 +23,7 @@ def find_tagdb_inparents(fname: str, directory: str | None = None) -> Optional[P
     for path in filepath.absolute().parents:
         dbpath = path / fname
         if dbpath.exists():
-            return dbpath
+            return dbpath.absolute()
     return None
 
 
@@ -81,14 +81,17 @@ def read_pipe() -> List[str]:
 
 
 class DataBase:
-    def __init__(self, fname: str, directory: str | None = None):
+    def __init__(self, fname: str, directory: str | None = None, make_new: bool = False):
         self.db_fname = check_tagdb(fname, directory)
-        self._to_make_new: bool = False if exists(fname) else True
+        self._to_make_new: bool = make_new and not exists(self.db_fname)
         if not Path(self.db_fname).parent.exists():
             raise FileNotFoundError(
                 f'''Cannot make file {self.db_fname}.
 You may need to make directory named {Path(self.db_fname).parent}.''')
-        self.con = sqlite3.connect(fname)
+        if not Path(self.db_fname).exists():
+            print('No database')
+            sys.exit()
+        self.con = sqlite3.connect(self.db_fname)
         self.cur = self.con.cursor()
         self._make_new_tables()
 

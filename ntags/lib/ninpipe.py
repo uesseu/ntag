@@ -126,7 +126,7 @@ class PipeFname(Pipe):
         '''
         if self.from_glob:
             if not self.started:
-                self.glob_iter = iter(glob(self.directory))
+                self.glob_iter = iter(glob(self.directory + '/*'))
                 self.started = True
             try:
                 self.result = next(self.glob_iter)
