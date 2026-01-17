@@ -124,6 +124,36 @@ set backupcopy=yes
 
 Unfortunate , I do not know about emacs or vscode.
 
+# Completion
+It is my configuration in bashrc.
+
+```sh
+_ntag() {
+  local cur prev words cword split
+  _init_completion || return
+  local DEFAULTIFS=$' \t\n'
+  local IFS=$DEFAULTIFS
+  MAIN_CHOICE='export import add color delete filter init list make remove show path sort status add_comment get_comment filter_comment cleanup'
+
+  case $cword in
+    1)
+      COMPREPLY=( $(compgen -W "$MAIN_CHOICE" -- "$cur") )
+      ;;
+    *)
+      case ${words[1]} in
+        filter | delete | add | remove)
+          COMPREPLY=( $(compgen -W '$(ntag list -n)' -- "$cur") )
+          ;;
+        -d)
+          COMPREPLY=( $(compgen -W '$(ntag list -n)' -- "$cur") )
+          ;;
+        esac
+          ;;
+  esac
+}
+
+complete -F _ntag ntag
+```
 # Compatibility issue
 Mac OS and android and iOS was not tested, because I have no Mac, no iphone and no ipad. If someone use it in such machines, please report me. I can not pay money but must appreciate a lot!
 
