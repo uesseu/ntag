@@ -44,10 +44,11 @@ def check_tagdb(fname: str, directory: str | None = None) -> str:
 class Stat:
     def __init__(self, fname):
         self.fname = fname
-        self.inode = None
-        self.size = None
+        self.inode = 0
+        self.size = 0
         self.uid = None
         self.gid = None
+        self.time = {}
         self.load()
 
     def load(self):
@@ -57,6 +58,11 @@ class Stat:
             self.size = self.stat[ST_SIZE]
             self.uid = self.stat[ST_UID]
             self.gid = self.stat[ST_GID]
+            self.time = {
+                'c': self.stat[ST_CTIME],
+                'a': self.stat[ST_ATIME],
+                'm': self.stat[ST_MTIME]
+            }
 
 
 def get_inode(fname: str) -> Optional[int]:

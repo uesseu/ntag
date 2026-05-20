@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 import sys
 from typing import cast
+from datetime import datetime
 
 
 class Command:
@@ -41,11 +42,17 @@ class ByteUnit:
     def get_byte_order(self):
         if self.unit_is(['', 'byte', 'b']):
             return 1
-        if self.unit_is(['kb', 'k', 'kilobyte', 'kbyte']):
+        if self.unit_is(
+                ['kb', 'k', 'kilobyte', 'kilobytes', 'kbyte', 'kbytes']
+        ):
             return 1024
-        if self.unit_is(['mb', 'm', 'megabyte', 'mbyte']):
+        if self.unit_is(
+                ['mb', 'm', 'megabyte', 'megabytes', 'mbyte', 'mbytes']
+        ):
             return 1024 ** 2
-        if self.unit_is(['gb', 'g', 'gigabyte', 'gbyte']):
+        if self.unit_is(
+                ['gb', 'g', 'gigabyte', 'gigabytes', 'gbyte', 'gbytes']
+        ):
             return 1024 ** 3
         return 0
 
@@ -77,3 +84,94 @@ def set_custom_directory(parser):
         '-r', '--relative', action='store_true',
         help='Load database from the relative path of "-d" option.'
     )
+
+
+class TimeUnit:
+    def __init__(self):
+        self.days = 0
+        self.seconds = 0
+        self.milliseconds = 0
+
+    def add(self, value: int, unit: str, is_date: bool):
+        if unit.upper() == 'Y':
+            if is_date:
+                Exception(f'Value must be date "{value} {unit}"')
+            self.days += value * 365
+        elif unit.upper() == 'M':
+            if is_date:
+                self.days += value * 30
+            else:
+                self.seconds += value * 60
+        elif unit.upper() == 'W':
+            if is_date:
+                Exception(f'Value must be date "{value} {unit}"')
+            self.days += value * 7
+        elif unit.upper() == 'D':
+            if is_date:
+                Exception(f'Value must be date "{value} {unit}"')
+            self.days += value
+        elif unit.upper() == 'H':
+            if is_date:
+                Exception(f'Value must be time "{value} {unit}"')
+            self.seconds += value * 3600
+        elif unit.upper() == 'S':
+            if is_date:
+                Exception(f'Value must be time "{value} {unit}"')
+            self.seconds += value
+
+    def __repr__(self):
+        return f'{self.days} {self.seconds} {self.milliseconds}'
+
+class TimedeltaParser:
+    TITLE = 'PT'
+    SEPS = 'PYMDTHS'
+
+    def __init__(self, text):
+        self.text = text
+        self.length = len(text)
+        self.cursor = 0
+        self.is_date = True
+        # self.date = 
+        # self.date = dict(
+        #     days=0,
+        #     seconds=0,
+        #     microseconds=0,
+        #     milliseconds=0,
+        #     minutes=0,
+        #     hours=0,
+        #     weeks=0
+        # )
+
+    def __next__(self) -> dict:
+        if self.cursor == self.length:
+            raise StopIteration
+        if self.text[self.cursor] in self.TITLE:
+            result = self.text[self.cursor]
+            self.cursor += 1
+            if result == 'T':
+                self.is_date = False
+            return dict(value=0, unit=result[-1], is_date=self.is_date)
+        first_cursor = self.cursor
+        while self.cursor != self.length\
+                and self.text[self.cursor] not in self.SEPS:
+            self.cursor += 1
+        self.cursor += 1
+        result = self.text[first_cursor: self.cursor]
+        return dict(
+            value=int(result[0:-1]),
+            unit=result[-1],
+            is_date=self.is_date
+        )
+
+    def __iter__(self):
+        return self
+
+    def to_timedelta(self):
+        timeunit = TimeUnit()
+        for n in self:
+            timeunit.add(**n)
+        return datetime.timedelta(
+            timeunit.days,
+            timeunit.seconds,
+            timeunit.milliseconds
+        )
