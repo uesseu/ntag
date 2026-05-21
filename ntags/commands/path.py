@@ -16,6 +16,8 @@ def path_command():
     parser.add_argument('-r', '--relative',
                         default='./',
                         help='Relative path from...')
+    parser.add_argument('-d', '--directory', default='',
+                        help='Directory path')
     args = parser.parse_args()
 
     lines = [
