@@ -54,7 +54,7 @@ ntag filter good -T 20220814/now
     parser.add_argument('-u', '--upper', default='', help='Max size of file.')
     parser.add_argument('-l', '--lower', default='',
                         help='Minimum size of file.')
-    parser.add_argument('-T', '--time', default='/',
+    parser.add_argument('-T', '--time', default='',
                         help='Get file newer than the date.'
                         'The grammer is based on ISO 8601 range format.'
                         '"/" must be included.'
