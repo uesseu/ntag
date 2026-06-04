@@ -11,7 +11,7 @@ Example.
 # Rename tag named hoge to fuga
 > ntag rename hoge fuga''')
     parser.add_argument('command', help='Sub command.')
-    parser.add_argument('tag', help='Tag name to delete.')
+    parser.add_argument('tag', help='Tag name to rename.')
     args = parser.parse_args()
 
     with DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '') as db:
