@@ -64,7 +64,7 @@ Example:
     with DataBase(DEFAULT_TAGDB_FNAME) as db:
         fnames = PipeFname(
             from_glob=sys.stdin.isatty() or args.directory is not None,
-            directory=(args.directory + '/*') if args.directory else './*'
+            directory=(args.directory) if args.directory else './*'
         ).async_iter()
         for data in fnames:
             fname = data.receive()
