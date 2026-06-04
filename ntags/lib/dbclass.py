@@ -182,12 +182,12 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
         return cast(int, result[0][0])
 
     def has_tag(self, inode: int, tag: str) -> bool:
-        matched = list(self.cur.execute(
+        matched = (self.cur.execute(
             '''SELECT inode
             FROM inode JOIN tags ON inode.id = tags.id
             WHERE tag=? AND inode=?''',
             (tag, inode)))
-        return True if len(matched) else False
+        return any(matched)
 
     def has_tags(self, inode: int, tags: List[str]) -> bool:
         return any(self.has_tag(inode, tag) for tag in tags)
