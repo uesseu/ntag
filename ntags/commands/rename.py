@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from argparse import ArgumentParser
 from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME
 from ..lib.misc import get_tag_from_arg, EXCLUDEDCHAR
 
@@ -19,4 +20,4 @@ Example.
         for exe in EXCLUDEDCHAR:
             if exe in name:
                 raise Exception('You can not put such characters like ', EXCLUDEDCHAR)
-        db.rename_tag(tag, name)
+        db.rename_tag(args.tag, name)
