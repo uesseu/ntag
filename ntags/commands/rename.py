@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME
-from ..lib.misc import get_tag_from_arg
+from ..lib.misc import get_tag_from_arg, EXCLUDEDCHAR
 
 
 def rename_command():
@@ -15,4 +15,8 @@ Example.
     args = parser.parse_args()
 
     with DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '') as db:
-        db.rename_tag(tag, input())
+        name = input().strip()
+        for exe in EXCLUDEDCHAR:
+            if exe in name:
+                raise Exception('You can not put such characters like ', EXCLUDEDCHAR)
+        db.rename_tag(tag, name)

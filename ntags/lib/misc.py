@@ -3,6 +3,7 @@ import sys
 from typing import cast
 from datetime import datetime
 
+EXCLUDEDCHAR = '! &|'
 
 class Command:
     help = ''
