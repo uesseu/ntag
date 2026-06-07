@@ -2,10 +2,11 @@
 import sys
 from datetime import datetime
 from pathlib import Path
+import re
 from argparse import ArgumentParser
 from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, Stat
 from ..lib.color import format_color
-from ..lib.misc import get_number_unit, set_custom_directory
+from ..lib.misc import get_number_unit, set_custom_directory, EXCLUDEDCHAR
 from ..lib.ninpipe import PipeFname
 
 
@@ -30,6 +31,11 @@ Size can be filtered by -u(--upper) and -l(--lower).
 Time can be filtered by -T. Format of time is ISO 8601 format.
 Additionally, you can write "now".
 
+You can use script mode. Script must be one strign.
+&: and, !: not, |: or
+Example.
+    ntag filter -s 'hoge&fuga|!piyo'
+
 Example.
 # A typical example. [from 2022/8/14 to 2023/2/11]
 ntag filter good -T 2022-08-14/2023-02-11
@@ -40,7 +46,7 @@ ntag filter good -T 20220209/0517
 ntag filter good -T 20220814/now
 ''')
     parser.add_argument('command', help='Sub command.')
-    parser.add_argument('tag', nargs='*', help='Tag name to show.')
+    parser.add_argument('tag', nargs='*', help='Tag name to show. It is not "and" but "or".')
     parser.add_argument('-v', '--invert', action='store_true',
                         help='Invert flag.')
     parser.add_argument('-c', '--comment', action='store_true',
@@ -65,7 +71,11 @@ ntag filter good -T 20220814/now
                         'mtime(modify time) and ctime(create time).'
                         'It can be 1 character like "a", "m", "c".'
                         )
-    parser.add_argument('--parent', action='store_true')
+    #parser.add_argument('-p', '--parent', action='store_true')
+    parser.add_argument('-s', '--script', default='', type=str,
+                        help='Script mode. For example "hoge&fuga&!piyo"')
+    parser.add_argument('-R', '--regex', default='',
+                        help='Regex to filter by file name.')
     set_custom_directory(parser)
     args = parser.parse_args()
     upper = get_number_unit(args.upper)
@@ -81,6 +91,47 @@ ntag filter good -T 20220814/now
         post = datetime.now() if post == 'now' else datetime.fromisoformat(post)
     mode = args.timemode[0].lower()
 
+    class Command:
+        def __init__(self, command: str, value: str, invert: bool):
+            self.command = command
+            self.value = value
+            self.invert = invert
+
+        def __repr__(self):
+            return f'{self.command} {self.value} {"invert" if self.invert else ""}'
+
+    class ScriptParser:
+        def __init__(self, script):
+            self.script = script
+            self.length = len(script)
+            self.cur = 0
+            self.commands = []
+
+        def parse(self):
+            command, value, invert = '|', [], False
+            command = '&'
+            while self.cur != self.length:
+                char = self.script[self.cur]
+                if char in '|&':
+                    self.commands.append(
+                        Command(command, ''.join(value), invert)
+                    )
+                    command, value, invert = char, [], False
+                elif char == ' ':
+                    pass
+                elif char == '!':
+                    invert = True
+                else:
+                    value.append(char)
+                self.cur += 1
+            self.commands.append(
+                Command(command, ''.join(value), invert)
+            )
+            return self.commands
+
+    if args.script:
+        commands: list[Command] = ScriptParser(args.script).parse()
+
     with DataBase(
         DEFAULT_TAGDB_FNAME, args.directory if args.relative else ''
     ) as db:
@@ -88,10 +139,14 @@ ntag filter good -T 20220814/now
             from_glob=sys.stdin.isatty() or args.directory is not None,
             directory=args.directory if args.directory else '.'
         ).async_iter()
+        regex = re.compile(args.regex) if args.regex else None
         for data in fnames:
             fname = data.receive()
             if not fname:
                 break
+            if regex:
+                if not regex.search(fname):
+                    break
             path = Path(fname).absolute()
             if not path.exists():
                 continue
@@ -107,11 +162,22 @@ ntag filter good -T 20220814/now
                 if stat.size < lower.as_byte:
                     continue
             if args.time:
-                if (datetime.fromtimestamp(stat.time[mode]) < pre
+                if (datetime.fromtimestamp(stat.time[mode]) < pre\
                      or datetime.fromtimestamp(stat.time[mode]) > post):
                     continue
             if args.tag:
                 if not args.invert ^ db.has_tags(stat.inode, args.tag):
+                    continue
+            if args.script:
+                remain = True
+                for command in commands:
+                    current = db.has_tag(stat.inode, command.value)
+                    current ^= command.invert
+                    if command.command == '|':
+                        remain = remain or current
+                    else:
+                        remain = remain and current
+                if not remain:
                     continue
             sys.stdout.write(fname)
             if sys.stdout.isatty():
