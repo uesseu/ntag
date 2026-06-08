@@ -143,7 +143,7 @@ ntag filter good -T 20220814/now
         for data in fnames:
             fname = data.receive()
             if not fname:
-                break
+                continue
             if regex:
                 if not regex.search(fname):
                     continue
