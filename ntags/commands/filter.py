@@ -146,7 +146,7 @@ ntag filter good -T 20220814/now
                 break
             if regex:
                 if not regex.search(fname):
-                    break
+                    continue
             path = Path(fname).absolute()
             if not path.exists():
                 continue
