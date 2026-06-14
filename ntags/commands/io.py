@@ -1,4 +1,6 @@
 from ..lib.dbclass import DataBase, get_inode, DEFAULT_TAGDB_FNAME
+from ..lib.misc import set_custom_directory
+from argparse import ArgumentParser
 from sys import stdin
 import json
 from multiprocessing import Pool
@@ -13,6 +15,13 @@ def _get_inode_fname(data):
 
 
 def export_command():
+    parser = ArgumentParser(
+        usage='''Export the database as json to STDOUT.
+Example:
+    ntag export > hoge.json''')
+    parser.add_argument('command')
+    set_custom_directory(parser)
+    args = parser.parse_args()
     fname_dict = {}
     with DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '') as db:
         with Pool(min(os.cpu_count(), 8)) as p:
@@ -34,6 +43,13 @@ def export_command():
 
 
 def import_command():
+    parser = ArgumentParser(
+        usage='''Import the database from STDIN.
+Example:
+    ntag export < hoge.json''')
+    parser.add_argument('command')
+    set_custom_directory(parser)
+    args = parser.parse_args()
     db_json = json.loads(stdin.read())
     fname_dict = db_json['files']
     tags = db_json['tags']

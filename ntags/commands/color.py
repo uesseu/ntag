@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME
 from ..lib.color import COLOR, ATTRIBUTE, BG_COLOR, encode_color, format_color
+from argparse import ArgumentParser
+from ..lib.misc import set_custom_directory
 
 
 def input_int(num_range) -> int:
@@ -16,6 +18,13 @@ def input_int(num_range) -> int:
 
 
 def color_command() -> None:
+    parser = ArgumentParser(
+        usage='''Color picker of ntags.
+Example:
+    ntag color [tag name]''')
+    parser.add_argument('command')
+    set_custom_directory(parser)
+    args = parser.parse_args()
     print('Write tag number in this list')
     with DataBase(DEFAULT_TAGDB_FNAME, args.directory and args.relative) as db:
         taglist = list(db.get_taglist())
