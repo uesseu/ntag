@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -91,6 +92,16 @@ ntag filter good -T 20220814/now
         post = datetime.now() if post == 'now' else datetime.fromisoformat(post)
     mode = args.timemode[0].lower()
 
+    def get_dir_size(path):
+        whole = 0
+        with os.scandir(path) as it:
+            for item in it:
+                if item.is_file():
+                    whole += item.stat().st_size
+                elif item.is_dir():
+                    whole += get_dir_size(item.path)
+        return whole
+
     class Command:
         def __init__(self, command: str, value: str, invert: bool):
             self.command = command
@@ -140,6 +151,7 @@ ntag filter good -T 20220814/now
             directory=args.directory if args.directory else '.'
         ).async_iter()
         regex = re.compile(args.regex) if args.regex else None
+        is_dir = False
         for data in fnames:
             fname = data.receive()
             if not fname:
@@ -150,17 +162,20 @@ ntag filter good -T 20220814/now
             path = Path(fname).absolute()
             if not path.exists():
                 continue
-            if args.dironly and not path.is_dir():
+            is_dir = path.is_dir()
+            if args.dironly and not is_dir:
                 continue
             if args.fileonly and not path.is_file():
                 continue
             stat = Stat(fname)
-            if args.upper:
-                if stat.size > upper.as_byte:
-                    continue
-            if args.lower:
-                if stat.size < lower.as_byte:
-                    continue
+            if args.upper or args.lower:
+                size = stat.size if not is_dir else get_dir_size(path)
+                if args.upper:
+                    if size > upper.as_byte:
+                        continue
+                if args.lower:
+                    if size < lower.as_byte:
+                        continue
             if args.time:
                 if (datetime.fromtimestamp(stat.time[mode]) < pre\
                      or datetime.fromtimestamp(stat.time[mode]) > post):
