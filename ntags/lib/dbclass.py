@@ -112,12 +112,6 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
                 '''CREATE TABLE inode (id integer, inode integer)'''
             )
             self.cur.execute(
-                '''CREATE TABLE path (id integer, path text)'''
-            )
-            self.cur.execute(
-                '''CREATE TABLE pathcomment (id integer, comment text)'''
-            )
-            self.cur.execute(
                 '''CREATE TABLE comment (inode integer, comment text)'''
             )
         self.need_to_make_new = False
