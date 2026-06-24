@@ -86,9 +86,11 @@ def read_pipe() -> List[str]:
             return file_list
 
 
-class DataBase:
-    def __init__(self, fname: str, directory: str | None = None, make_new: bool = False):
+class DataBaseBase:
+    def __init__(self, fname: str, directory: str | None = None,
+                 make_new: bool = False):
         self.db_fname = check_tagdb(fname, directory)
+        Path(self.db_fname).copy(self.db_fname + '_backup')
         self._to_make_new: bool = make_new and not exists(self.db_fname)
         if not Path(self.db_fname).parent.exists():
             raise FileNotFoundError(
@@ -110,11 +112,28 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
                 '''CREATE TABLE inode (id integer, inode integer)'''
             )
             self.cur.execute(
+                '''CREATE TABLE path (id integer, path text)'''
+            )
+            self.cur.execute(
+                '''CREATE TABLE pathcomment (id integer, comment text)'''
+            )
+            self.cur.execute(
                 '''CREATE TABLE comment (inode integer, comment text)'''
             )
         self.need_to_make_new = False
         self.con.commit()
 
+    def __enter__(self) -> 'DataBase':
+        return self
+
+    def __exit__(self, *arg: Any) -> None:
+        self.con.close()
+
+    def close(self) -> None:
+        self.__exit__()
+
+
+class TagDataBase(DataBaseBase):
     def make_new_tag(self, tag: str, color: Optional[str] = None) -> None:
         if len(list(self.cur.execute(
             '''SELECT tag FROM tags WHERE tag==?;''',
@@ -138,26 +157,6 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
         )
         self.con.commit()
 
-    def remove_tag_from_inode(self, tag: str, inode: int) -> None:
-        tid = self._tag2id(tag)
-        self.cur.execute(
-            '''DELETE from inode WHERE id=? AND inode=?;''',
-            (tid, inode)
-        )
-        self.con.commit()
-
-    def delete_tag(self, tag: str) -> None:
-        tid = self._tag2id(tag)
-        self.cur.execute(
-            '''DELETE from inode WHERE id=?;''',
-            (tid,)
-        )
-        self.cur.execute(
-            '''DELETE from tags WHERE id=?''',
-            (tid,)
-        )
-        self.con.commit()
-
     def rename_tag(self, tag: str, name: str) -> None:
         self.cur.execute(
             '''UPDATE tags SET tag=? WHERE tag=?;''',
@@ -165,10 +164,9 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
         )
         self.con.commit()
 
-    def _tag2id(self, tag: str) -> int:
+    def tag2id(self, tag: str) -> int:
         sql_iter = self.cur.execute(
-            '''SELECT id FROM tags
-            WHERE tag = ?''',
+            '''SELECT id FROM tags WHERE tag = ?''',
             (tag,)
         )
         result = list(sql_iter)
@@ -181,16 +179,36 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
                 sys.exit()
         return cast(int, result[0][0])
 
+
+class DataBase(TagDataBase):
+
+    def remove_tag_from_inode(self, tag: str, inode: int) -> None:
+        tid = self.tag2id(tag)
+        self.cur.execute(
+            '''DELETE from inode WHERE id=? AND inode=?;''',
+            (tid, inode)
+        )
+        self.con.commit()
+
+    def delete_tag(self, tag: str) -> None:
+        tid = self.tag2id(tag)
+        self.cur.execute(
+            '''DELETE from inode WHERE id=?;''',
+            (tid,)
+        )
+        self.cur.execute(
+            '''DELETE from tags WHERE id=?''',
+            (tid,)
+        )
+        self.con.commit()
+
     def has_tag(self, inode: int, tag: str) -> bool:
         matched = (self.cur.execute(
-            '''SELECT inode
+            '''SELECT inode, tag
             FROM inode JOIN tags ON inode.id = tags.id
             WHERE tag=? AND inode=?''',
             (tag, inode)))
         return any(matched)
-
-    def has_tags(self, inode: int, tags: List[str]) -> bool:
-        return any(self.has_tag(inode, tag) for tag in tags)
 
     def add_comment(self, inode: int, comment: str):
         if self.get_comment(inode):
@@ -217,23 +235,9 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
             return None
         self.cur.execute(
             '''INSERT INTO inode (id, inode) VALUES(?,?);''',
-            (self._tag2id(tag), inode)
+            (self.tag2id(tag), inode)
         )
         self.con.commit()
-
-    def __enter__(self) -> 'DataBase':
-        return self
-
-    def tag2inode(self, tag: int) -> List[str]:
-        sql_iter = self.cur.execute(
-            '''SELECT inode
-            FROM tags JOIN inode ON tags.id = inode.id
-            WHERE tag = ?;''',
-            (tag,)
-        )
-        result = list(sql_iter)
-        self.con.commit()
-        return [r[0] for r in result]
 
     def show(self) -> None:
         print('tags', list(self.cur.execute('select * from tags')))
@@ -242,22 +246,29 @@ You may need to make directory named {Path(self.db_fname).parent}.''')
     def get_taglist(self) -> Iterable[Tuple[str, str]]:
         return self.cur.execute('select tag, color from tags')
 
-    def inode2tag(self, inode: int) -> List[str]:
+    def path2tag(self, path: str) -> list[tuple[str]]:
+        """
+        Return tag and color of path, not using inode.
+        """
+        sql_iter = self.cur.execute(
+            '''SELECT tag, color
+            FROM tags JOIN inode ON tags.id = path.id
+            WHERE path = ?;''',
+            (Path(path).resolve(),)
+        )
+        return self.cur.fetchall()
+
+    def inode2tag(self, inode: int) -> list[tuple[str]]:
+        """
+        Return tag and color of inode.
+        """
         sql_iter = self.cur.execute(
             '''SELECT tag, color
             FROM tags JOIN inode ON tags.id = inode.id
             WHERE inode = ?;''',
             (inode,)
         )
-        result = list(sql_iter)
-        self.con.commit()
-        return [r for r in result]
-
-    def __exit__(self, *arg: Any) -> None:
-        self.con.close()
-
-    def close(self) -> None:
-        self.__exit__()
+        return self.cur.fetchall()
 
 
 def print_status(db: DataBase) -> None:

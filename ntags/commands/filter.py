@@ -151,8 +151,8 @@ ntag filter good -T 20220814/now
             directory=args.directory if args.directory else '.'
         ).async_iter()
         regex = re.compile(args.regex) if args.regex else None
-        is_dir = False
         for data in fnames:
+            is_dir = False
             fname = data.receive()
             if not fname:
                 continue
@@ -180,8 +180,9 @@ ntag filter good -T 20220814/now
                 if (datetime.fromtimestamp(stat.time[mode]) < pre\
                      or datetime.fromtimestamp(stat.time[mode]) > post):
                     continue
+            tags = db.inode2tag(stat.inode)
             if args.tag:
-                if not args.invert ^ db.has_tags(stat.inode, args.tag):
+                if not args.invert ^ any((tag[0] in args.tag for tag in tags)):
                     continue
             if args.script:
                 remain = True
@@ -194,14 +195,11 @@ ntag filter good -T 20220814/now
                         remain = remain and current
                 if not remain:
                     continue
+            # Write output to stdout
             sys.stdout.write(fname)
             if sys.stdout.isatty():
-                ftags = [
-                    format_color(*tag) for tag in
-                    db.inode2tag(stat.inode)
-                ]
                 sys.stdout.write(' [ ')
-                sys.stdout.write(' '.join(ftags))
+                sys.stdout.write(' '.join((format_color(*t) for t in tags)))
                 sys.stdout.write(' ]')
             if args.comment:
                 comment = db.get_comment(stat.inode)
