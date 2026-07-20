@@ -3,7 +3,9 @@ from typing import List, cast, Any, Optional, Union, Tuple, Iterable
 from os.path import exists
 from logging import getLogger, INFO, DEBUG
 from pathlib import Path
+from .defaults import DEFAULT_TAGDB_FNAME, DEFAULT_TAGJSON_FNAME
 import sys
+import shutil
 from os import stat, environ
 from stat import (
     ST_INO, ST_GID, ST_SIZE, ST_CTIME, ST_MTIME,
@@ -11,7 +13,6 @@ from stat import (
 )
 logger = getLogger()
 logger.setLevel(INFO)
-DEFAULT_TAGDB_FNAME = '.nintag_db'
 
 
 def find_tagdb_inparents(fname: str, directory: str | None = None) -> Optional[Path]:
@@ -27,6 +28,7 @@ def find_tagdb_inparents(fname: str, directory: str | None = None) -> Optional[P
     return None
 
 
+
 def check_tagdb(fname: str, directory: str | None = None) -> str:
     '''
     Find tag file and returns the name.
@@ -39,6 +41,17 @@ def check_tagdb(fname: str, directory: str | None = None) -> str:
         print('Consider "ntag init" to make it in current directory.')
         sys.exit()
     return str(db_fname)
+
+
+def check_tagjson(fname: str, directory: str | None = None) -> str:
+    '''
+    Find tag file and returns the name.
+    It kills this program itself if there is no tag file.
+    '''
+    fname = environ['NINTAG_JSON'] if 'NINTAG_JSON' in environ else fname
+    db = find_tagdb_inparents(fname, directory)
+    if db:
+        return db.parent / DEFAULT_TAGJSON_FNAME
 
 
 class Stat:
@@ -90,7 +103,7 @@ class DataBaseBase:
     def __init__(self, fname: str, directory: str | None = None,
                  make_new: bool = False):
         self.db_fname = check_tagdb(fname, directory)
-        Path(self.db_fname).copy(self.db_fname + '_backup')
+        shutil.copy(self.db_fname, self.db_fname + '_backup')
         self._to_make_new: bool = make_new and not exists(self.db_fname)
         if not Path(self.db_fname).parent.exists():
             raise FileNotFoundError(
@@ -263,6 +276,13 @@ class DataBase(TagDataBase):
             (inode,)
         )
         return self.cur.fetchall()
+
+    def get_color(self, tag):
+        sql_iter = self.cur.execute(
+            '''SELECT color FROM tags WHERE tag = ?;''',
+            (tag,)
+        )
+        return self.cur.fetchall()[0][0]
 
 
 def print_status(db: DataBase) -> None:

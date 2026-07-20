@@ -13,6 +13,7 @@ from .io import export_command, import_command
 from .comment import addcomment_command
 from .comment import getcomment_command
 from .comment import filtercomment_command
+from .edit import edit_command
 from .sort import sort_command
 from .path import path_command
 from .cleanup import cleanup_command
@@ -35,6 +36,7 @@ commands['add_comment'] = addcomment_command
 commands['get_comment'] = getcomment_command
 commands['filter_comment'] = filtercomment_command
 commands['cleanup'] = cleanup_command
+commands['edit'] = edit_command
 
 
 def main():
@@ -69,4 +71,7 @@ filter_comment : Filter by comment
 # Import and export
 export : Export tag dababase as json.
 import : Import tag dababase from json.
+
+# Path based tag
+edit   : Edit or make the path based tag data.
 ''')

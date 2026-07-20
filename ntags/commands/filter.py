@@ -5,7 +5,8 @@ from datetime import datetime
 from pathlib import Path
 import re
 from argparse import ArgumentParser
-from ..lib.dbclass import DataBase, DEFAULT_TAGDB_FNAME, Stat
+from ..lib.dbclass import DataBase, Stat, check_tagjson
+from ..lib.defaults import DEFAULT_TAGJSON_FNAME, DEFAULT_TAGDB_FNAME
 from ..lib.color import format_color
 from ..lib.misc import get_number_unit, set_custom_directory, EXCLUDEDCHAR
 from ..lib.ninpipe import PipeFname
@@ -143,6 +144,16 @@ ntag filter good -T 20220814/now
     if args.script:
         commands: list[Command] = ScriptParser(args.script).parse()
 
+    tagjson = check_tagjson(DEFAULT_TAGJSON_FNAME)
+    if tagjson:
+        import json
+        path_tags = json.loads(Path(tagjson).read_text())
+        #path_tags = {
+        #    str(Path(path['path']).resolve()): path['tag']
+        #    for path
+        #    in json.loads(Path(tagjson).read_text())
+        #}
+
     with DataBase(
         DEFAULT_TAGDB_FNAME, args.directory if args.relative else ''
     ) as db:
@@ -181,6 +192,10 @@ ntag filter good -T 20220814/now
                      or datetime.fromtimestamp(stat.time[mode]) > post):
                     continue
             tags = db.inode2tag(stat.inode)
+            if tagjson:
+                key = str(path.resolve())
+                if key in path_tags:
+                    tags += [(t, db.get_color(t)) for t in path_tags[key]['tag']]
             if args.tag:
                 if not args.invert ^ any((tag[0] in args.tag for tag in tags)):
                     continue
@@ -207,3 +222,4 @@ ntag filter good -T 20220814/now
                     sys.stdout.write(': ')
                     sys.stdout.write(comment[0])
             sys.stdout.write('\n')
+
