@@ -13,5 +13,5 @@ def init_command(from_root: bool = False):
     parser.add_argument('command', help='Sub command of ntag.')
     parser.parse_args()
 
-    db = DataBase(DEFAULT_TAGDB_FNAME)
+    db = DataBase(DEFAULT_TAGDB_FNAME, directory='./', make_new=True)
     db.close()

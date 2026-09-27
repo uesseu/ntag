@@ -102,14 +102,15 @@ def read_pipe() -> List[str]:
 class DataBaseBase:
     def __init__(self, fname: str, directory: str | None = None,
                  make_new: bool = False):
-        self.db_fname = check_tagdb(fname, directory)
-        shutil.copy(self.db_fname, self.db_fname + '_backup')
+        self.db_fname = fname if make_new else check_tagdb(fname, directory)
+        if exists(self.db_fname):
+            shutil.copy(self.db_fname, self.db_fname + '_backup')
         self._to_make_new: bool = make_new and not exists(self.db_fname)
         if not Path(self.db_fname).parent.exists():
             raise FileNotFoundError(
                 f'''Cannot make file {self.db_fname}.
 You may need to make directory named {Path(self.db_fname).parent}.''')
-        if not Path(self.db_fname).exists():
+        if not Path(self.db_fname).exists() and not make_new:
             print('No database')
             sys.exit()
         self.con = sqlite3.connect(self.db_fname)
