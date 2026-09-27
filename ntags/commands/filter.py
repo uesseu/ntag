@@ -148,18 +148,13 @@ ntag filter good -T 20220814/now
     if tagjson:
         import json
         path_tags = json.loads(Path(tagjson).read_text())
-        #path_tags = {
-        #    str(Path(path['path']).resolve()): path['tag']
-        #    for path
-        #    in json.loads(Path(tagjson).read_text())
-        #}
 
     with DataBase(
         DEFAULT_TAGDB_FNAME, args.directory if args.relative else ''
     ) as db:
         fnames = PipeFname(
             from_glob=sys.stdin.isatty() or args.directory is not None,
-            directory=args.directory if args.directory else '.'
+            directory=args.directory if args.directory else './*'
         ).async_iter()
         regex = re.compile(args.regex) if args.regex else None
         for data in fnames:
@@ -193,9 +188,10 @@ ntag filter good -T 20220814/now
                     continue
             tags = db.inode2tag(stat.inode)
             if tagjson:
-                key = str(path.resolve())
-                if key in path_tags:
-                    tags += [(t, db.get_color(t)) for t in path_tags[key]['tag']]
+                try:
+                    tags += [(t, db.get_color(t)) for t in path_tags[str(path.resolve())]['tag']]
+                except:
+                    pass
             if args.tag:
                 if not args.invert ^ any((tag[0] in args.tag for tag in tags)):
                     continue

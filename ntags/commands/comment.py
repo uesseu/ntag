@@ -1,10 +1,14 @@
 #!/usr/bin/env python
-from ..lib.dbclass import DataBase, get_inode, DEFAULT_TAGDB_FNAME
+from ..lib.dbclass import (
+    DataBase, get_inode, DEFAULT_TAGDB_FNAME, check_tagjson, DEFAULT_TAGJSON_FNAME
+)
 from ..lib.ninpipe import Pipe, PipeFname
 from ..lib.misc import set_custom_directory
 from argparse import ArgumentParser
 from os.path import exists
 import sys
+from pathlib import Path
+tagjson = check_tagjson(DEFAULT_TAGJSON_FNAME)
 
 
 def addcomment_command():
@@ -60,11 +64,16 @@ Example:
     parser.add_argument('keywords')
     set_custom_directory(parser)
     args = parser.parse_args()
+    import re
+    regex = re.compile(args.keywords)
 
+    if tagjson:
+        import json
+        path_tags = json.loads(Path(tagjson).read_text())
     with DataBase(DEFAULT_TAGDB_FNAME) as db:
         fnames = PipeFname(
             from_glob=sys.stdin.isatty() or args.directory is not None,
-            directory=(args.directory) if args.directory else './*'
+            directory=(args.directory) if args.directory else ''
         ).async_iter()
         for data in fnames:
             fname = data.receive()
@@ -72,11 +81,20 @@ Example:
                 break
             if not exists(fname):
                 continue
+            if tagjson:
+                try:
+                    if (path_tags[str(Path(fname).resolve())]['comment']):
+                        sys.stdout.write(fname)
+                        sys.stdout.write('\n')
+                        sys.stdout.flush()
+                        continue
+                except:
+                    pass
             comment = db.get_comment(get_inode(fname))
             comment = comment[0] if comment else ''
-            if args.keywords in comment:
-                sys.stdout.write(fname)
-                sys.stdout.write('\n')
-                sys.stdout.flush()
-
+            if not regex.search(comment):
+                continue
+            sys.stdout.write(fname)
+            sys.stdout.write('\n')
+            sys.stdout.flush()
 
