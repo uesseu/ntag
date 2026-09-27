@@ -31,6 +31,7 @@ ls ./*_good.csv | ntag-add good new''')
             '-f', '--file', default='./',
             help='File name'
         )
+
     args = parser.parse_args()
     if args.path:
         tagjson = check_tagjson(DEFAULT_TAGJSON_FNAME, '')
@@ -42,7 +43,6 @@ ls ./*_good.csv | ntag-add good new''')
             else:
                 path = [str(Path(p).resolve()) for p in Pipe()]
             for p in path:
-                print(p)
                 if p in data:
                     data[p]['tag'] += args.tag
                 else:

@@ -23,6 +23,7 @@ Example:
     set_custom_directory(parser)
     args = parser.parse_args()
     fname_dict = {}
+    comments_dict = {}
     with DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '') as db:
         with Pool(min(os.cpu_count(), 8)) as p:
             inode_file_list = p.map(_get_inode_fname, os.walk('.'))
@@ -33,13 +34,17 @@ Example:
                     fname_dict[tag[0]].append(fname)
                 else:
                     fname_dict.update({tag[0]: [fname]})
-        print(json.dumps(
-            {
+            comment = db.get_comment(inode)
+            if comment:
+                comments_dict.update({comment[0]: fname})
+        print(
+            json.dumps({
                 'os': os.uname().sysname,
                 'tags': list(db.get_taglist()),
-                'files': fname_dict
-            }
-        ))
+                'files': fname_dict,
+                'comments': comments_dict
+            })
+        )
 
 
 def import_command():
@@ -52,6 +57,7 @@ Example:
     args = parser.parse_args()
     db_json = json.loads(stdin.read())
     fname_dict = db_json['files']
+    comments_dict = db_json['comments']
     tags = db_json['tags']
     same_os = db_json['os'] == os.uname().sysname != 'NT'
     with DataBase(DEFAULT_TAGDB_FNAME, args.directory and args.relative) as db:
@@ -60,3 +66,6 @@ Example:
         for key, values in fname_dict.items():
             for value in values:
                 db.add_tag(get_inode(value), key)
+        for key, values in comments_dict.items():
+            for value in values:
+                db.add_comment(get_inode(value), key)

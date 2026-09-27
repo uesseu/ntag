@@ -287,7 +287,9 @@ class DataBase(TagDataBase):
 
 def print_status(db: DataBase) -> None:
     if 'NINTAG_DB' in environ:
-        print('NINTAG_DB:',
-              environ['NINTAG_DB'],
-              '\n  Environment of NINTAG_DB')
+        print(
+            'NINTAG_DB:',
+            environ['NINTAG_DB'],
+            '\n  Environment of NINTAG_DB'
+        )
     print('Path of current database:', Path(db.db_fname).absolute())
