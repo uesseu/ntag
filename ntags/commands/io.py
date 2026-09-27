@@ -37,7 +37,7 @@ Example:
                     fname_dict.update({tag[0]: [fname]})
             comment = db.get_comment(inode)
             if comment:
-                comments_dict.update({comment[0]: fname})
+                comments_dict.update({fname: comment[0]})
         print(
             json.dumps({
                 'os': platform.system(),
