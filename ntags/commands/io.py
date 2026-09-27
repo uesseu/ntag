@@ -5,6 +5,7 @@ from sys import stdin
 import json
 from multiprocessing import Pool
 import os
+import platform
 from itertools import chain
 
 
@@ -39,7 +40,7 @@ Example:
                 comments_dict.update({comment[0]: fname})
         print(
             json.dumps({
-                'os': os.uname().sysname,
+                'os': platform.system(),
                 'tags': list(db.get_taglist()),
                 'files': fname_dict,
                 'comments': comments_dict
@@ -59,7 +60,7 @@ Example:
     fname_dict = db_json['files']
     comments_dict = db_json['comments']
     tags = db_json['tags']
-    same_os = db_json['os'] == os.uname().sysname != 'NT'
+    same_os = db_json['os'] == platform.system() != 'Windows'
     with DataBase(DEFAULT_TAGDB_FNAME, args.directory and args.relative) as db:
         for tag, color in tags:
             db.make_new_tag(tag, color if same_os else None)
