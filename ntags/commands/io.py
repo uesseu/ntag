@@ -67,6 +67,5 @@ Example:
         for key, values in fname_dict.items():
             for value in values:
                 db.add_tag(get_inode(value), key)
-        for key, values in comments_dict.items():
-            for value in values:
-                db.add_comment(get_inode(value), key)
+        for fname, comment in comments_dict.items():
+            db.add_comment(get_inode(fname), comment)
