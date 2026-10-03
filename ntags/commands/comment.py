@@ -58,6 +58,8 @@ Example:
 def filtercomment_command():
     parser = ArgumentParser(
         usage='''Filter by comment.
+The comment will be filterd by regex.
+
 Example:
     ls | ntag filter_comment hoge''')
     parser.add_argument('command')
