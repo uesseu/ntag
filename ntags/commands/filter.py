@@ -160,6 +160,8 @@ ntag filter good -T 20220814/now
         for data in fnames:
             is_dir = False
             fname = data.receive()
+            if data.pipe.ended:
+                break
             if not fname:
                 continue
             if regex:
