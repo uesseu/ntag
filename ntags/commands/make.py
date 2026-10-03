@@ -14,7 +14,7 @@ def make_command():
     Example.
     echo hoge | ntag make''')
     parser.add_argument('command', help='Sub command of ntag.')
-    parser.parse_args()
+    args = parser.parse_args()
 
     if sys.stdin.isatty():
         print('Please enter a name of tag.')
@@ -24,5 +24,5 @@ def make_command():
         if exe in tagname:
             raise Exception('You can not put such characters like ', EXCLUDEDCHAR)
 
-    with DataBase(DEFAULT_TAGDB_FNAME, args.directory if args.relative else '') as db:
+    with DataBase(DEFAULT_TAGDB_FNAME, '') as db:
         db.make_new_tag(tagname)
