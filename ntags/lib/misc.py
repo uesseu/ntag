@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 import sys
 from typing import cast
 from datetime import datetime
+from os.path import curdir
 
 EXCLUDEDCHAR = '! &|'
 
@@ -77,7 +78,7 @@ def get_number_unit(text: str) -> ByteUnit:
 
 def set_custom_directory(parser):
     parser.add_argument(
-        '-d', '--directory', default=None,
+        '-d', '--directory', default=curdir,
         help='Directory path to read.'
         ' This option prevents readlines from stdin.'
     )
