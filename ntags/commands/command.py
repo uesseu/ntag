@@ -43,9 +43,7 @@ def main():
     if len(sys.argv) > 1 and sys.argv[1] in commands.keys():
         commands[sys.argv[1]]()
     else:
-        print('''Tag maker for unix like system.
-Please look subcommands for details.
-This is list of subcommands.
+        print('''Tag and comment utility for CUI.
 
 # Manage tags
 init    : Initialize tag database
